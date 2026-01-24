@@ -1,3 +1,5 @@
+import type { EnvironmentType } from "./constants.js";
+
 /**
  * App configuration
  */
@@ -5,7 +7,7 @@ export interface AppConfig {
   /** Application name */
   name: string;
   /** Environment: development, production, test */
-  env?: "development" | "production" | "test";
+  env?: EnvironmentType;
   /** Debug mode */
   debug?: boolean;
 }

@@ -58,6 +58,69 @@ describe("env()", () => {
     Bun.env.NUM_VAR = "3000";
     expect(env("NUM_VAR", 0)).toBe(3000);
   });
+
+  // Extended boolean coercion tests
+  it("coerces '1' to boolean true when default is boolean", () => {
+    Bun.env.BOOL_VAR = "1";
+    expect(env("BOOL_VAR", false)).toBe(true);
+  });
+
+  it("coerces 'yes' to boolean true when default is boolean", () => {
+    Bun.env.BOOL_VAR = "yes";
+    expect(env("BOOL_VAR", false)).toBe(true);
+  });
+
+  it("coerces other strings to boolean false when default is boolean", () => {
+    Bun.env.BOOL_VAR = "nope";
+    expect(env("BOOL_VAR", true)).toBe(false);
+  });
+
+  // Type isolation tests - ensure types don't bleed into each other
+  it("returns '1' as string when default is string", () => {
+    Bun.env.STR_VAR = "1";
+    expect(env("STR_VAR", "default")).toBe("1");
+    expect(typeof env("STR_VAR", "default")).toBe("string");
+  });
+
+  it("returns 'true' as string when default is string", () => {
+    Bun.env.STR_VAR = "true";
+    expect(env("STR_VAR", "default")).toBe("true");
+    expect(typeof env("STR_VAR", "default")).toBe("string");
+  });
+
+  it("returns 'yes' as string when default is string", () => {
+    Bun.env.STR_VAR = "yes";
+    expect(env("STR_VAR", "default")).toBe("yes");
+    expect(typeof env("STR_VAR", "default")).toBe("string");
+  });
+
+  it("returns numeric string as string when default is string", () => {
+    Bun.env.STR_VAR = "3000";
+    expect(env("STR_VAR", "default")).toBe("3000");
+    expect(typeof env("STR_VAR", "default")).toBe("string");
+  });
+
+  it("returns value as string when no default provided", () => {
+    Bun.env.STR_VAR = "1";
+    expect(env("STR_VAR")).toBe("1");
+    expect(typeof env("STR_VAR")).toBe("string");
+  });
+
+  // Number edge cases
+  it("returns default when value is not a valid number", () => {
+    Bun.env.NUM_VAR = "not-a-number";
+    expect(env("NUM_VAR", 42)).toBe(42);
+  });
+
+  it("handles negative numbers", () => {
+    Bun.env.NUM_VAR = "-100";
+    expect(env("NUM_VAR", 0)).toBe(-100);
+  });
+
+  it("handles floating point numbers", () => {
+    Bun.env.NUM_VAR = "3.14";
+    expect(env("NUM_VAR", 0)).toBe(3.14);
+  });
 });
 
 describe("isDev()", () => {

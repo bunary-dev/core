@@ -5,6 +5,7 @@
 
 import { describe, expect, it } from "bun:test";
 import { defineConfig } from "../src/config";
+import { Environment } from "../src/constants";
 
 describe("defineConfig()", () => {
   it("returns a config object with provided values", () => {
@@ -28,7 +29,7 @@ describe("defineConfig()", () => {
     });
 
     // Should match current NODE_ENV (which is 'test' during bun test)
-    expect(config.app.env).toBe(Bun.env.NODE_ENV ?? "development");
+    expect(config.app.env).toBe(Bun.env.NODE_ENV === "test" ? Environment.TEST : Environment.DEVELOPMENT);
   });
 
   it("defaults debug to false when not specified", () => {

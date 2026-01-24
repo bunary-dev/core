@@ -19,7 +19,10 @@ export function defineConfig(config: BunaryConfig): BunaryConfig {
   return {
     app: {
       name: config.app.name,
-      env: config.app.env ?? (Bun.env.NODE_ENV as BunaryConfig["app"]["env"]) ?? "development",
+      env:
+        config.app.env ??
+        (Bun.env.NODE_ENV as BunaryConfig["app"]["env"]) ??
+        "development",
       debug: config.app.debug ?? Bun.env.DEBUG === "true",
     },
   };

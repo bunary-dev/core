@@ -17,7 +17,7 @@
  */
 export function env<T extends string | number | boolean | undefined>(
   key: string,
-  defaultValue?: T
+  defaultValue?: T,
 ): T extends undefined ? string | undefined : T {
   const value = Bun.env[key];
 
@@ -32,7 +32,9 @@ export function env<T extends string | number | boolean | undefined>(
 
   if (typeof defaultValue === "number") {
     const num = Number(value);
-    return (Number.isNaN(num) ? defaultValue : num) as T extends undefined ? string | undefined : T;
+    return (Number.isNaN(num) ? defaultValue : num) as T extends undefined
+      ? string | undefined
+      : T;
   }
 
   // Default: return as string

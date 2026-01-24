@@ -1,2 +1,71 @@
-# core
-@bunary/core - Foundation package for the Bunary framework. Configuration, environment, and shared utilities.
+# @bunary/core
+
+Foundation module for the Bunary framework — configuration, environment helpers, and shared utilities.
+
+## Installation
+
+```bash
+bun add @bunary/core
+```
+
+## Usage
+
+### Environment Variables
+
+```typescript
+import { env, isDev, isProd, isTest } from '@bunary/core';
+
+// Get environment variable with automatic type coercion
+const port = env('PORT', 3000);        // Returns number
+const debug = env('DEBUG', false);     // Returns boolean
+const name = env('APP_NAME', 'myapp'); // Returns string
+
+// Environment detection
+if (isDev()) {
+  console.log('Running in development mode');
+}
+```
+
+### Configuration
+
+```typescript
+import { defineConfig } from '@bunary/core';
+
+export default defineConfig({
+  app: {
+    name: 'MyApp',
+    env: 'development',
+    debug: true,
+  },
+});
+```
+
+## API
+
+### `env<T>(key: string, defaultValue?: T): T`
+
+Get an environment variable with optional default and automatic type coercion.
+
+### `isDev(): boolean`
+
+Returns `true` if `NODE_ENV` is `"development"` or not set.
+
+### `isProd(): boolean`
+
+Returns `true` if `NODE_ENV` is `"production"`.
+
+### `isTest(): boolean`
+
+Returns `true` if `NODE_ENV` is `"test"`.
+
+### `defineConfig(config: BunaryConfig): BunaryConfig`
+
+Type-safe configuration helper with defaults.
+
+## Requirements
+
+- Bun ≥1.0.0
+
+## License
+
+MIT

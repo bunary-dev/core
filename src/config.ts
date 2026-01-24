@@ -1,3 +1,4 @@
+import { Environment } from "./constants.js";
 import type { BunaryConfig } from "./types";
 
 /**
@@ -22,7 +23,7 @@ export function defineConfig(config: BunaryConfig): BunaryConfig {
       env:
         config.app.env ??
         (Bun.env.NODE_ENV as BunaryConfig["app"]["env"]) ??
-        "development",
+        Environment.DEVELOPMENT,
       debug: config.app.debug ?? Bun.env.DEBUG === "true",
     },
   };

@@ -4,5 +4,6 @@
  */
 
 export { defineConfig } from "./config";
+export { Environment, type EnvironmentType } from "./constants";
 export { env, isDev, isProd, isTest } from "./environment";
 export type { BunaryConfig, AppConfig } from "./types";

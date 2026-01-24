@@ -1,6 +1,6 @@
 {
   "name": "@bunary/core",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Foundation module for Bunary - config, environment, and app helpers",
   "type": "module",
   "main": "./dist/index.js",
@@ -16,7 +16,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "bun build ./src/index.ts --outdir ./dist --target bun",
+    "build": "bun build ./src/index.ts --outdir ./dist --target bun && bunx tsc -p tsconfig.build.json",
     "typecheck": "bunx tsc --noEmit",
     "test": "bun test",
     "lint": "bunx biome check ./src"

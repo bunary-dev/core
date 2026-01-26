@@ -3,6 +3,12 @@ import type { BunaryConfig } from "./types";
 
 let globalBunaryConfig: BunaryConfig | null = null;
 
+// Global registry for cross-package access (used by @bunary/orm)
+// biome-ignore lint/suspicious/noExplicitAny: Global registry for cross-package access
+(globalThis as any).__bunaryCoreConfig = {
+  getConfig: () => globalBunaryConfig,
+};
+
 /**
  * Define Bunary configuration with type safety
  *

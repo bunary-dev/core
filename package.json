@@ -1,6 +1,6 @@
 {
   "name": "@bunary/core",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Foundation module for Bunary - config, environment, and app helpers",
   "type": "module",
   "main": "./dist/index.js",
@@ -30,6 +30,14 @@
   ],
   "author": "Paul Radford",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bunary-dev/core.git"
+  },
+  "homepage": "https://github.com/bunary-dev/core#readme",
+  "bugs": {
+    "url": "https://github.com/bunary-dev/core/issues"
+  },
   "engines": {
     "bun": ">=1.0.0"
   },

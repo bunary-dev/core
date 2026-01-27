@@ -4,7 +4,7 @@
  */
 
 import { describe, expect, it } from "bun:test";
-import { defineConfig, createConfig } from "../src/config";
+import { defineConfig, createConfig, getBunaryConfig } from "../src/config";
 import { Environment } from "../src/constants";
 
 describe("defineConfig()", () => {
@@ -61,6 +61,14 @@ describe("defineConfig()", () => {
     expect(devConfig.app.env).toBe("development");
     expect(prodConfig.app.env).toBe("production");
     expect(testConfig.app.env).toBe("test");
+  });
+});
+
+describe("getBunaryConfig()", () => {
+  it("throws with migration guidance (global config removed)", () => {
+    expect(() => getBunaryConfig()).toThrow(
+      "Global Bunary configuration has been removed. Create an instance config store with createConfig() and call store.get().",
+    );
   });
 });
 

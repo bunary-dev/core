@@ -41,6 +41,7 @@ export const configStore = createConfig(defineConfig({
 
 // The resolved config object (use this in most app code)
 export default configStore.get();
+
 ```
 
 ## API
@@ -65,9 +66,11 @@ Returns `true` if `NODE_ENV` is `"test"`.
 
 Type-safe configuration helper with defaults.
 
+
 ### `createConfig(config?: BunaryConfig): BunaryConfigStore`
 
 Create an **instance-scoped** configuration store with `get()`, `set()`, and `clear()`.
+
 
 ## Requirements
 

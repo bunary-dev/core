@@ -46,6 +46,19 @@ export const config = createConfig(
 
 `getBunaryConfig()` no longer returns a global config. If you call it, it will throw with guidance to use `createConfig()` instead.
 
+Before:
+
+```ts
+const config = getBunaryConfig();
+```
+
+After:
+
+```ts
+const store = createConfig(defineConfig({ /* ... */ }));
+const config = store.get();
+```
+
 ## API
 
 ### `env<T>(key: string, defaultValue?: T): T`

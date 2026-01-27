@@ -3,11 +3,28 @@
  * TDD: Testing defineConfig()
  */
 
-import { describe, expect, it } from "bun:test";
+import { afterEach, describe, expect, it } from "bun:test";
 import { defineConfig, createConfig, getBunaryConfig } from "../src/config";
 import { Environment } from "../src/constants";
 
 describe("defineConfig()", () => {
+  const originalNodeEnv = Bun.env.NODE_ENV;
+  const originalDebug = Bun.env.DEBUG;
+
+  afterEach(() => {
+    if (originalNodeEnv === undefined) {
+      delete Bun.env.NODE_ENV;
+    } else {
+      Bun.env.NODE_ENV = originalNodeEnv;
+    }
+
+    if (originalDebug === undefined) {
+      delete Bun.env.DEBUG;
+    } else {
+      Bun.env.DEBUG = originalDebug;
+    }
+  });
+
   it("returns a config object with provided values", () => {
     const config = defineConfig({
       app: {
@@ -61,6 +78,26 @@ describe("defineConfig()", () => {
     expect(devConfig.app.env).toBe("development");
     expect(prodConfig.app.env).toBe("production");
     expect(testConfig.app.env).toBe("test");
+  });
+
+  it("falls back to development when NODE_ENV is invalid", () => {
+    Bun.env.NODE_ENV = "staging";
+    const config = defineConfig({ app: { name: "TestApp" } });
+    expect(config.app.env).toBe("development");
+  });
+
+  it("falls back to development when config.app.env is invalid", () => {
+    const config = defineConfig({
+      // biome-ignore lint/suspicious/noExplicitAny: testing runtime validation
+      app: { name: "TestApp", env: "staging" as any },
+    });
+    expect(config.app.env).toBe("development");
+  });
+
+  it("parses DEBUG consistently with env('DEBUG', false) semantics", () => {
+    Bun.env.DEBUG = "1";
+    const config = defineConfig({ app: { name: "TestApp" } });
+    expect(config.app.debug).toBe(true);
   });
 });
 

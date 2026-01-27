@@ -1,5 +1,13 @@
 import { Environment } from "./constants.js";
+import { env as envVar } from "./environment.js";
 import type { BunaryConfig } from "./types";
+
+function normalizeEnv(value: unknown): BunaryConfig["app"]["env"] {
+  if (value === Environment.DEVELOPMENT) return Environment.DEVELOPMENT;
+  if (value === Environment.PRODUCTION) return Environment.PRODUCTION;
+  if (value === Environment.TEST) return Environment.TEST;
+  return Environment.DEVELOPMENT;
+}
 
 /**
  * Instance-scoped configuration container.
@@ -71,14 +79,13 @@ export function createConfig(initial?: BunaryConfig): BunaryConfigStore {
  * ```
  */
 export function defineConfig(config: BunaryConfig): BunaryConfig {
+  const rawEnv = config.app.env ?? Bun.env.NODE_ENV;
+
   const validated: BunaryConfig = {
     app: {
       name: config.app.name,
-      env:
-        config.app.env ??
-        (Bun.env.NODE_ENV as BunaryConfig["app"]["env"]) ??
-        Environment.DEVELOPMENT,
-      debug: config.app.debug ?? Bun.env.DEBUG === "true",
+      env: normalizeEnv(rawEnv),
+      debug: config.app.debug ?? (envVar("DEBUG", false) as boolean),
     },
   };
 

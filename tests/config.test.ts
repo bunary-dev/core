@@ -94,8 +94,20 @@ describe("defineConfig()", () => {
     expect(config.app.env).toBe("development");
   });
 
-  it("parses DEBUG consistently with env('DEBUG', false) semantics", () => {
+  it("parses DEBUG=1 as true", () => {
     Bun.env.DEBUG = "1";
+    const config = defineConfig({ app: { name: "TestApp" } });
+    expect(config.app.debug).toBe(true);
+  });
+
+  it("parses DEBUG=true as true", () => {
+    Bun.env.DEBUG = "true";
+    const config = defineConfig({ app: { name: "TestApp" } });
+    expect(config.app.debug).toBe(true);
+  });
+
+  it("parses DEBUG=yes as true", () => {
+    Bun.env.DEBUG = "yes";
     const config = defineConfig({ app: { name: "TestApp" } });
     expect(config.app.debug).toBe(true);
   });

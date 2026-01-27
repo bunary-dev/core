@@ -1,13 +1,53 @@
 import { Environment } from "./constants.js";
 import type { BunaryConfig } from "./types";
 
-let globalBunaryConfig: BunaryConfig | null = null;
+/**
+ * Instance-scoped configuration container.
+ *
+ * This replaces global mutable config and allows multiple independent app instances
+ * to exist in the same process.
+ */
+export interface BunaryConfigStore {
+  /** Set the current config for this instance */
+  set: (config: BunaryConfig) => void;
+  /** Get the current config for this instance */
+  get: () => BunaryConfig;
+  /** Clear the current config for this instance (useful for tests) */
+  clear: () => void;
+}
 
-// Global registry for cross-package access (used by @bunary/orm)
-// biome-ignore lint/suspicious/noExplicitAny: Global registry for cross-package access
-(globalThis as any).__bunaryCoreConfig = {
-  getConfig: () => globalBunaryConfig,
-};
+/**
+ * Create an isolated Bunary config store.
+ *
+ * @param initial - Optional initial config to set
+ * @returns A config store with get/set/clear methods
+ *
+ * @example
+ * ```ts
+ * import { createConfig, defineConfig } from "@bunary/core";
+ *
+ * const config = createConfig(defineConfig({ app: { name: "MyApp" } }));
+ * const current = config.get();
+ * ```
+ */
+export function createConfig(initial?: BunaryConfig): BunaryConfigStore {
+  let current: BunaryConfig | null = initial ?? null;
+
+  return {
+    set: (config: BunaryConfig) => {
+      current = config;
+    },
+    get: () => {
+      if (!current) {
+        throw new Error("Bunary configuration not set. Call set() first.");
+      }
+      return current;
+    },
+    clear: () => {
+      current = null;
+    },
+  };
+}
 
 /**
  * Define Bunary configuration with type safety
@@ -47,7 +87,6 @@ export function defineConfig(config: BunaryConfig): BunaryConfig {
     validated.orm = config.orm;
   }
 
-  globalBunaryConfig = validated;
   return validated;
 }
 
@@ -58,10 +97,9 @@ export function defineConfig(config: BunaryConfig): BunaryConfig {
  * @throws If configuration has not been set
  */
 export function getBunaryConfig(): BunaryConfig {
-  if (!globalBunaryConfig) {
-    throw new Error("Bunary configuration not set. Call defineConfig() first.");
-  }
-  return globalBunaryConfig;
+  throw new Error(
+    "Global Bunary configuration has been removed. Create an instance config store with createConfig() and call store.get().",
+  );
 }
 
 /**
@@ -70,5 +108,5 @@ export function getBunaryConfig(): BunaryConfig {
  * @internal
  */
 export function clearBunaryConfig(): void {
-  globalBunaryConfig = null;
+  // No-op: global config has been removed.
 }

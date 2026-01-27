@@ -4,7 +4,7 @@
  */
 
 import { describe, expect, it } from "bun:test";
-import { defineConfig } from "../src/config";
+import { defineConfig, createConfig } from "../src/config";
 import { Environment } from "../src/constants";
 
 describe("defineConfig()", () => {
@@ -61,5 +61,38 @@ describe("defineConfig()", () => {
     expect(devConfig.app.env).toBe("development");
     expect(prodConfig.app.env).toBe("production");
     expect(testConfig.app.env).toBe("test");
+  });
+});
+
+describe("createConfig()", () => {
+  it("creates an isolated config instance", () => {
+    const cfgA = createConfig(
+      defineConfig({
+        app: { name: "A", env: "development", debug: true },
+      }),
+    );
+    const cfgB = createConfig(
+      defineConfig({
+        app: { name: "B", env: "production", debug: false },
+      }),
+    );
+
+    expect(cfgA.get().app.name).toBe("A");
+    expect(cfgB.get().app.name).toBe("B");
+  });
+
+  it("throws when get() called before set()", () => {
+    const cfg = createConfig();
+    expect(() => cfg.get()).toThrow();
+  });
+
+  it("can be cleared without affecting other instances", () => {
+    const cfgA = createConfig(defineConfig({ app: { name: "A" } }));
+    const cfgB = createConfig(defineConfig({ app: { name: "B" } }));
+
+    cfgA.clear();
+
+    expect(() => cfgA.get()).toThrow();
+    expect(cfgB.get().app.name).toBe("B");
   });
 });

@@ -100,7 +100,7 @@ describe("createConfig()", () => {
 
     cfgA.clear();
 
-    expect(() => cfgA.get()).toThrow();
+    expect(() => cfgA.get()).toThrow("Bunary configuration not set. Call set() first.");
     expect(cfgB.get().app.name).toBe("B");
   });
 

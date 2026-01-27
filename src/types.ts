@@ -29,6 +29,13 @@ export interface OrmConfig {
       password: string;
       database: string;
     };
+    postgres?: {
+      host: string;
+      port?: number;
+      user: string;
+      password: string;
+      database: string;
+    };
   };
 }
 

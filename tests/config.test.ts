@@ -49,6 +49,17 @@ describe("defineConfig()", () => {
     expect(config.app.env).toBe(Bun.env.NODE_ENV === "test" ? Environment.TEST : Environment.DEVELOPMENT);
   });
 
+  it("prefers explicit config env over NODE_ENV", () => {
+    Bun.env.NODE_ENV = "production";
+    const config = defineConfig({
+      app: {
+        name: "TestApp",
+        env: "development",
+      },
+    });
+    expect(config.app.env).toBe("development");
+  });
+
   it("defaults debug to false when not specified", () => {
     const config = defineConfig({
       app: {

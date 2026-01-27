@@ -85,7 +85,7 @@ export function defineConfig(config: BunaryConfig): BunaryConfig {
     app: {
       name: config.app.name,
       env: normalizeEnv(rawEnv),
-      debug: config.app.debug ?? (envVar("DEBUG", false) as boolean),
+      debug: config.app.debug ?? envVar("DEBUG", false),
     },
   };
 

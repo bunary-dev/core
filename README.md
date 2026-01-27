@@ -29,15 +29,34 @@ if (isDev()) {
 ### Configuration
 
 ```typescript
-import { defineConfig } from '@bunary/core';
+import { createConfig, defineConfig } from '@bunary/core';
 
-export default defineConfig({
-  app: {
-    name: 'MyApp',
-    env: 'development',
-    debug: true,
-  },
-});
+export const config = createConfig(
+  defineConfig({
+    app: {
+      name: 'MyApp',
+      env: 'development',
+      debug: true,
+    },
+  }),
+);
+```
+
+### Migration note: `getBunaryConfig()`
+
+`getBunaryConfig()` now always throws when called and no longer returns a global config. To migrate, keep a reference to the store returned by `createConfig()` and access your configuration via `store.get()`.
+
+Before:
+
+```ts
+const config = getBunaryConfig();
+```
+
+After:
+
+```ts
+const store = createConfig(defineConfig({ /* ... */ }));
+const config = store.get();
 ```
 
 ## API
@@ -61,6 +80,10 @@ Returns `true` if `NODE_ENV` is `"test"`.
 ### `defineConfig(config: BunaryConfig): BunaryConfig`
 
 Type-safe configuration helper with defaults.
+
+### `createConfig(initial?: BunaryConfig)`
+
+Create an instance-scoped config store with `get()`, `set()`, and `clear()` methods.
 
 ## Requirements
 

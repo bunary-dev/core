@@ -95,4 +95,18 @@ describe("createConfig()", () => {
     expect(() => cfgA.get()).toThrow();
     expect(cfgB.get().app.name).toBe("B");
   });
+
+  it("normalizes config when set() is called", () => {
+    const cfg = createConfig();
+    cfg.set({
+      app: {
+        name: "Normalized",
+      },
+    });
+
+    const current = cfg.get();
+    expect(current.app.name).toBe("Normalized");
+    expect(current.app.env).toBeDefined();
+    expect(current.app.debug).toBeDefined();
+  });
 });

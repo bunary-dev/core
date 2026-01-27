@@ -31,11 +31,11 @@ export interface BunaryConfigStore {
  * ```
  */
 export function createConfig(initial?: BunaryConfig): BunaryConfigStore {
-  let current: BunaryConfig | null = initial ?? null;
+  let current: BunaryConfig | null = initial ? defineConfig(initial) : null;
 
   return {
     set: (config: BunaryConfig) => {
-      current = config;
+      current = defineConfig(config);
     },
     get: () => {
       if (!current) {

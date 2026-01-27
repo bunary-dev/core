@@ -44,7 +44,7 @@ export const config = createConfig(
 
 ### Migration note: `getBunaryConfig()`
 
-`getBunaryConfig()` no longer returns a global config. If you call it, it will throw with guidance to use `createConfig()` instead.
+`getBunaryConfig()` now always throws when called and no longer returns a global config. To migrate, keep a reference to the store returned by `createConfig()` and access your configuration via `store.get()`.
 
 Before:
 

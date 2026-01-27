@@ -70,6 +70,17 @@ describe("defineConfig()", () => {
     expect(config.app.debug).toBe(true);
   });
 
+  it("prefers explicit debug over DEBUG env var", () => {
+    Bun.env.DEBUG = "1";
+    const config = defineConfig({
+      app: {
+        name: "TestApp",
+        debug: false,
+      },
+    });
+    expect(config.app.debug).toBe(false);
+  });
+
   it("accepts all valid env values", () => {
     const devConfig = defineConfig({ app: { name: "Test", env: "development" } });
     const prodConfig = defineConfig({ app: { name: "Test", env: "production" } });

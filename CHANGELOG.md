@@ -5,6 +5,25 @@ All notable changes to `@bunary/core` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.6] - 2026-01-27
+
+### Changed
+
+- Removed global mutable config and global registry access in favor of an instance-scoped config store (`createConfig()`)
+  - This is a breaking change for any consumers relying on global config access.
+
+## [0.0.5] - 2026-01-26
+
+### Changed
+
+- Bumped package version to 0.0.5
+
+## [0.0.4] - 2026-01-26
+
+### Added
+
+- Global registry for cross-package config access (used by `@bunary/orm`)
+
 ## [0.0.3] - 2026-01-26
 
 ### Added

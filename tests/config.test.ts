@@ -83,7 +83,7 @@ describe("createConfig()", () => {
 
   it("throws when get() called before set()", () => {
     const cfg = createConfig();
-    expect(() => cfg.get()).toThrow();
+    expect(() => cfg.get()).toThrow("Bunary configuration not set. Call set() first.");
   });
 
   it("can be cleared without affecting other instances", () => {

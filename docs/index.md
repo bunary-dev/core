@@ -2,53 +2,49 @@
 
 Foundation module for the Bunary framework — configuration, environment helpers, and shared utilities.
 
-## Documentation
-
-Canonical documentation for this package lives in [`docs/index.md`](./docs/index.md).
-
 ## Installation
 
 ```bash
 bun add @bunary/core
 ```
 
-## Usage
+## Quickstart
 
-### Environment Variables
+### Environment variables
 
-```typescript
-import { env, isDev, isProd, isTest } from '@bunary/core';
+```ts
+import { env, isDev, isProd, isTest } from "@bunary/core";
 
-// Get environment variable with automatic type coercion
-const port = env('PORT', 3000);        // Returns number
-const debug = env('DEBUG', false);     // Returns boolean
-const name = env('APP_NAME', 'myapp'); // Returns string
+const port = env("PORT", 3000); // number
+const debug = env("DEBUG", false); // boolean
+const name = env("APP_NAME", "myapp"); // string
 
-// Environment detection
 if (isDev()) {
-  console.log('Running in development mode');
+  console.log("Running in development mode");
 }
 ```
 
 ### Configuration
 
-```typescript
-import { createConfig, defineConfig } from '@bunary/core';
+`createConfig()` returns an **instance-scoped store**, not the resolved config object. Most app code should use `configStore.get()` to read the resolved config.
 
-export const configStore = createConfig(defineConfig({
-  app: {
-    name: 'MyApp',
-    env: 'development',
-    debug: true,
-  },
-}));
+```ts
+import { createConfig, defineConfig } from "@bunary/core";
 
-// The resolved config object (use this in most app code)
+export const configStore = createConfig(
+  defineConfig({
+    app: {
+      name: "MyApp",
+      env: "development",
+      debug: true,
+    },
+  }),
+);
+
 export default configStore.get();
-
 ```
 
-## API
+## API reference
 
 ### `env<T>(key: string, defaultValue?: T): T`
 
@@ -70,16 +66,11 @@ Returns `true` if `NODE_ENV` is `"test"`.
 
 Type-safe configuration helper with defaults.
 
-
 ### `createConfig(config?: BunaryConfig): BunaryConfigStore`
 
 Create an **instance-scoped** configuration store with `get()`, `set()`, and `clear()`.
-
 
 ## Requirements
 
 - Bun ≥1.0.0
 
-## License
-
-MIT

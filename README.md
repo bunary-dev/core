@@ -1,10 +1,6 @@
 # @bunary/core
 
-Foundation module for the Bunary framework — configuration, environment helpers, and shared utilities.
-
-## Documentation
-
-Canonical documentation for this package lives in [`docs/index.md`](./docs/index.md).
+Foundation for the Bunary framework: config (defineConfig, createConfig), environment (env, isDev, isProd, isTest). Full reference: [docs/index.md](./docs/index.md).
 
 ## Installation
 
@@ -12,73 +8,17 @@ Canonical documentation for this package lives in [`docs/index.md`](./docs/index
 bun add @bunary/core
 ```
 
-## Usage
-
-### Environment Variables
+## Quick start
 
 ```typescript
-import { env, isDev, isProd, isTest } from '@bunary/core';
+import { env, createConfig, defineConfig } from "@bunary/core";
 
-// Get environment variable with automatic type coercion
-const port = env('PORT', 3000);        // Returns number
-const debug = env('DEBUG', false);     // Returns boolean
-const name = env('APP_NAME', 'myapp'); // Returns string
-
-// Environment detection
-if (isDev()) {
-  console.log('Running in development mode');
-}
-```
-
-### Configuration
-
-```typescript
-import { createConfig, defineConfig } from '@bunary/core';
-
-export const configStore = createConfig(defineConfig({
-  app: {
-    name: 'MyApp',
-    env: 'development',
-    debug: true,
-  },
-}));
-
-// The resolved config object (use this in most app code)
+const port = env("PORT", 3000);
+const configStore = createConfig(defineConfig({ app: { name: "MyApp", env: "development", debug: true } }));
 export default configStore.get();
-
 ```
 
-## API
-
-### `env<T>(key: string, defaultValue?: T): T`
-
-Get an environment variable with optional default and automatic type coercion.
-
-### `isDev(): boolean`
-
-Returns `true` if `NODE_ENV` is `"development"` or not set.
-
-### `isProd(): boolean`
-
-Returns `true` if `NODE_ENV` is `"production"`.
-
-### `isTest(): boolean`
-
-Returns `true` if `NODE_ENV` is `"test"`.
-
-### `defineConfig(config: BunaryConfig): BunaryConfig`
-
-Type-safe configuration helper with defaults.
-
-
-### `createConfig(config?: BunaryConfig): BunaryConfigStore`
-
-Create an **instance-scoped** configuration store with `get()`, `set()`, and `clear()`.
-
-
-## Requirements
-
-- Bun ≥1.0.0
+For API details, see [docs/index.md](./docs/index.md).
 
 ## License
 

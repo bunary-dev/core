@@ -1,6 +1,6 @@
 # @bunary/core
 
-Foundation module for the Bunary framework — configuration, environment helpers, and shared utilities.
+Foundation module for the Bunary framework: configuration, environment helpers, and shared utilities.
 
 ## Installation
 
@@ -8,15 +8,15 @@ Foundation module for the Bunary framework — configuration, environment helper
 bun add @bunary/core
 ```
 
-## Quickstart
+## Usage
 
-### Environment variables
+### Environment Variables
 
-```ts
+```typescript
 import { env, isDev, isProd, isTest } from "@bunary/core";
 
-const port = env("PORT", 3000); // number
-const debug = env("DEBUG", false); // boolean
+const port = env("PORT", 3000);        // number
+const debug = env("DEBUG", false);     // boolean
 const name = env("APP_NAME", "myapp"); // string
 
 if (isDev()) {
@@ -26,9 +26,9 @@ if (isDev()) {
 
 ### Configuration
 
-`createConfig()` returns an **instance-scoped store**, not the resolved config object. Most app code should use `configStore.get()` to read the resolved config.
+`createConfig()` returns an instance-scoped store, not the resolved config object. Use `configStore.get()` in app code to read the resolved config.
 
-```ts
+```typescript
 import { createConfig, defineConfig } from "@bunary/core";
 
 export const configStore = createConfig(
@@ -44,33 +44,36 @@ export const configStore = createConfig(
 export default configStore.get();
 ```
 
-## API reference
+## API
 
-### `env<T>(key: string, defaultValue?: T): T`
+### env\<T\>(key: string, defaultValue?: T): T
 
 Get an environment variable with optional default and automatic type coercion.
 
-### `isDev(): boolean`
+### isDev(): boolean
 
-Returns `true` if `NODE_ENV` is `"development"` or not set.
+Returns true if NODE_ENV is "development" or not set.
 
-### `isProd(): boolean`
+### isProd(): boolean
 
-Returns `true` if `NODE_ENV` is `"production"`.
+Returns true if NODE_ENV is "production".
 
-### `isTest(): boolean`
+### isTest(): boolean
 
-Returns `true` if `NODE_ENV` is `"test"`.
+Returns true if NODE_ENV is "test".
 
-### `defineConfig(config: BunaryConfig): BunaryConfig`
+### defineConfig(config: BunaryConfig): BunaryConfig
 
 Type-safe configuration helper with defaults.
 
-### `createConfig(config?: BunaryConfig): BunaryConfigStore`
+### createConfig(config?: BunaryConfig): BunaryConfigStore
 
-Create an **instance-scoped** configuration store with `get()`, `set()`, and `clear()`.
+Create an instance-scoped configuration store with `get()`, `set()`, and `clear()`.
 
 ## Requirements
 
-- Bun ≥1.0.0
+Bun ≥ 1.0.0
 
+## License
+
+MIT

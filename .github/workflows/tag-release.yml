@@ -18,10 +18,12 @@ jobs:
         with:
           fetch-depth: 0
 
+      - uses: oven-sh/setup-bun@v2
+
       - name: Get and validate version from package.json
         id: version
         run: |
-          VERSION=$(node -p "require('./package.json').version")
+          VERSION=$(bun -p "require('./package.json').version")
           if [ -z "$VERSION" ]; then
             echo "::error::package.json version is empty"
             exit 1

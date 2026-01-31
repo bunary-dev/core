@@ -1,0 +1,51 @@
+name: Tag release on main
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: tag-release
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Get and validate version from package.json
+        id: version
+        run: |
+          VERSION=$(bun -p "require('./package.json').version")
+          if [ -z "$VERSION" ]; then
+            echo "::error::package.json version is empty"
+            exit 1
+          fi
+          if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$'; then
+            echo "::error::Invalid semver format: $VERSION. Expected x.y.z or x.y.z-prerelease"
+            exit 1
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Check if tag already exists
+        run: |
+          TAG="v${{ steps.version.outputs.VERSION }}"
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "::error::Tag $TAG already exists. Bump the version in package.json before merging."
+            exit 1
+          fi
+
+      - name: Create and push tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          TAG="v${{ steps.version.outputs.VERSION }}"
+          git tag "$TAG" ${{ github.sha }}
+          git push origin "$TAG"

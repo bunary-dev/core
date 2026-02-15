@@ -10,8 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `has()` method on `BunaryConfigStore` — check if config is set without try/catch (#36)
-- `get()` now returns a shallow-frozen `Readonly<BunaryConfig>` to prevent accidental mutation (#35)
-- Runtime validation: `defineConfig()` throws if `app.name` is empty or whitespace-only (#37)
+- `get()` now returns a deep-frozen `Readonly<BunaryConfig>` to prevent accidental mutation of nested objects (#35)
+- Runtime validation: `defineConfig()` throws if `app.name` is not a string, empty, or whitespace-only (#37)
 - Tests for module augmentation property passthrough (#38)
 
 ### Changed

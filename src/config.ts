@@ -39,8 +39,8 @@ export interface BunaryConfigStore {
   /**
    * Get the current config for this instance
    *
-   * Returns a shallow-frozen object to prevent accidental mutation.
-   * Use `set()` to update the config.
+   * Returns a deep-frozen object to prevent accidental mutation
+   * of nested properties. Use `set()` to update the config.
    */
   get: () => Readonly<BunaryConfig>;
   /** Check whether a config has been set for this instance */

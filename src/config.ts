@@ -18,8 +18,15 @@ function normalizeEnv(value: unknown): BunaryConfig["app"]["env"] {
 export interface BunaryConfigStore {
   /** Set the current config for this instance */
   set: (config: BunaryConfig) => void;
-  /** Get the current config for this instance */
-  get: () => BunaryConfig;
+  /**
+   * Get the current config for this instance
+   *
+   * Returns a shallow-frozen object to prevent accidental mutation.
+   * Use `set()` to update the config.
+   */
+  get: () => Readonly<BunaryConfig>;
+  /** Check whether a config has been set for this instance */
+  has: () => boolean;
   /** Clear the current config for this instance (useful for tests) */
   clear: () => void;
 }
@@ -28,14 +35,17 @@ export interface BunaryConfigStore {
  * Create an isolated Bunary config store.
  *
  * @param initial - Optional initial config to set
- * @returns A config store with get/set/clear methods
+ * @returns A config store with get/set/has/clear methods
  *
  * @example
  * ```ts
  * import { createConfig, defineConfig } from "@bunary/core";
  *
  * const config = createConfig(defineConfig({ app: { name: "MyApp" } }));
- * const current = config.get();
+ *
+ * if (config.has()) {
+ *   const current = config.get(); // Readonly<BunaryConfig>
+ * }
  * ```
  */
 export function createConfig(initial?: BunaryConfig): BunaryConfigStore {
@@ -45,11 +55,14 @@ export function createConfig(initial?: BunaryConfig): BunaryConfigStore {
     set: (config: BunaryConfig) => {
       current = defineConfig(config);
     },
-    get: () => {
+    get: (): Readonly<BunaryConfig> => {
       if (!current) {
         throw new Error("Bunary configuration not set. Call set() first.");
       }
-      return current;
+      return Object.freeze({ ...current });
+    },
+    has: (): boolean => {
+      return current !== null;
     },
     clear: () => {
       current = null;
@@ -60,6 +73,14 @@ export function createConfig(initial?: BunaryConfig): BunaryConfigStore {
 /**
  * Define Bunary configuration with type safety
  *
+ * Validates `app.name` is non-empty and normalises `env` and `debug`.
+ * Any additional properties added via module augmentation (e.g. `orm`
+ * from `@bunary/orm`) are passed through unchanged.
+ *
+ * @param config - The configuration object
+ * @returns The validated configuration
+ * @throws If `app.name` is empty or whitespace-only
+ *
  * @example
  * ```ts
  * import { defineConfig } from "@bunary/core";
@@ -69,30 +90,28 @@ export function createConfig(initial?: BunaryConfig): BunaryConfigStore {
  *     name: "MyApp",
  *     env: "development",
  *   },
- *   orm: {
- *     database: {
- *       type: "sqlite",
- *       sqlite: { path: "./database.sqlite" }
- *     }
- *   }
  * });
  * ```
  */
 export function defineConfig(config: BunaryConfig): BunaryConfig {
+  if (!config.app.name || !config.app.name.trim()) {
+    throw new Error("BunaryConfig: app.name is required");
+  }
+
   const rawEnv = config.app.env ?? Bun.env.NODE_ENV;
 
+  // Extract app config, pass through any additional properties (orm, http, etc.)
+  // These are added via module augmentation by other packages
+  const { app, ...rest } = config;
+
   const validated: BunaryConfig = {
+    ...rest,
     app: {
-      name: config.app.name,
+      name: app.name,
       env: normalizeEnv(rawEnv),
-      debug: config.app.debug ?? envVar("DEBUG", false),
+      debug: app.debug ?? envVar("DEBUG", false),
     },
   };
-
-  // Include ORM config if provided (from @bunary/orm)
-  if (config.orm) {
-    validated.orm = config.orm;
-  }
 
   return validated;
 }

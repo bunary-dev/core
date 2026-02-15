@@ -13,37 +13,22 @@ export interface AppConfig {
 }
 
 /**
- * ORM configuration type (matches @bunary/orm OrmConfig)
- * Defined here to avoid circular dependency
- */
-export interface OrmConfig {
-  database: {
-    type: "sqlite" | "mysql" | "postgres";
-    sqlite?: {
-      path: string;
-    };
-    mysql?: {
-      host: string;
-      port?: number;
-      user: string;
-      password: string;
-      database: string;
-    };
-    postgres?: {
-      host: string;
-      port?: number;
-      user: string;
-      password: string;
-      database: string;
-    };
-  };
-}
-
-/**
  * Root Bunary configuration
+ *
+ * This interface is extended by other packages via module augmentation:
+ * - @bunary/orm adds `orm?: OrmConfig`
+ * - @bunary/http adds `http?: HttpConfig` (future)
+ *
+ * @example
+ * ```ts
+ * // In @bunary/orm:
+ * declare module "@bunary/core" {
+ *   interface BunaryConfig {
+ *     orm?: OrmConfig;
+ *   }
+ * }
+ * ```
  */
 export interface BunaryConfig {
   app: AppConfig;
-  /** Optional ORM configuration (from @bunary/orm) */
-  orm?: OrmConfig;
 }

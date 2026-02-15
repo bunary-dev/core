@@ -133,6 +133,34 @@ describe("defineConfig()", () => {
     const config = defineConfig({ app: { name: "TestApp" } });
     expect(config.app.debug).toBe(true);
   });
+
+  it("throws when app.name is empty", () => {
+    expect(() => defineConfig({ app: { name: "" } })).toThrow(
+      "BunaryConfig: app.name is required",
+    );
+  });
+
+  it("throws when app.name is whitespace-only", () => {
+    expect(() => defineConfig({ app: { name: "   " } })).toThrow(
+      "BunaryConfig: app.name is required",
+    );
+  });
+
+  it("preserves augmented properties through defineConfig", () => {
+    const ormConfig = {
+      database: { type: "sqlite" as const, sqlite: { path: "./test.db" } },
+    };
+
+    // Simulate module augmentation — extra properties should pass through
+    const config = defineConfig({
+      app: { name: "TestApp" },
+      // biome-ignore lint/suspicious/noExplicitAny: testing augmented property passthrough
+      orm: ormConfig,
+    } as any);
+
+    // biome-ignore lint/suspicious/noExplicitAny: testing augmented property passthrough
+    expect((config as any).orm).toEqual(ormConfig);
+  });
 });
 
 describe("getBunaryConfig()", () => {
@@ -187,5 +215,52 @@ describe("createConfig()", () => {
     expect(current.app.name).toBe("Normalized");
     expect(current.app.env).toBeDefined();
     expect(current.app.debug).toBeDefined();
+  });
+
+  it("preserves augmented properties through set() and get()", () => {
+    const ormConfig = {
+      database: { type: "sqlite" as const, sqlite: { path: "./test.db" } },
+    };
+
+    const cfg = createConfig();
+    // biome-ignore lint/suspicious/noExplicitAny: testing augmented property passthrough
+    cfg.set({ app: { name: "TestApp" }, orm: ormConfig } as any);
+
+    // biome-ignore lint/suspicious/noExplicitAny: testing augmented property passthrough
+    expect((cfg.get() as any).orm).toEqual(ormConfig);
+  });
+
+  it("returns a frozen object from get()", () => {
+    const cfg = createConfig(defineConfig({ app: { name: "Frozen" } }));
+    const config = cfg.get();
+
+    expect(Object.isFrozen(config)).toBe(true);
+    expect(() => {
+      // biome-ignore lint/suspicious/noExplicitAny: testing mutation safety
+      (config as any).app = { name: "Mutated" };
+    }).toThrow();
+  });
+
+  it("has() returns false before set()", () => {
+    const cfg = createConfig();
+    expect(cfg.has()).toBe(false);
+  });
+
+  it("has() returns true after createConfig with initial value", () => {
+    const cfg = createConfig(defineConfig({ app: { name: "HasTest" } }));
+    expect(cfg.has()).toBe(true);
+  });
+
+  it("has() returns true after set()", () => {
+    const cfg = createConfig();
+    cfg.set({ app: { name: "HasTest" } });
+    expect(cfg.has()).toBe(true);
+  });
+
+  it("has() returns false after clear()", () => {
+    const cfg = createConfig(defineConfig({ app: { name: "HasTest" } }));
+    expect(cfg.has()).toBe(true);
+    cfg.clear();
+    expect(cfg.has()).toBe(false);
   });
 });

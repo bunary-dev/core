@@ -64,11 +64,14 @@ Returns true if NODE_ENV is "test".
 
 ### defineConfig(config: BunaryConfig): BunaryConfig
 
-Type-safe configuration helper with defaults.
+Type-safe configuration helper with defaults. Validates `app.name` is non-empty. Passes through any augmented properties (e.g. `orm` from `@bunary/orm`).
 
 ### createConfig(config?: BunaryConfig): BunaryConfigStore
 
-Create an instance-scoped configuration store with `get()`, `set()`, and `clear()`.
+Create an instance-scoped configuration store with `get()`, `set()`, `has()`, and `clear()`.
+
+- `get()` returns a shallow-frozen `Readonly<BunaryConfig>` to prevent accidental mutation.
+- `has()` returns `true` if config has been set and not cleared.
 
 ## Requirements
 

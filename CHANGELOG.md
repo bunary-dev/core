@@ -5,6 +5,21 @@ All notable changes to `@bunary/core` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-02-15
+
+### Added
+
+- `has()` method on `BunaryConfigStore` — check if config is set without try/catch (#36)
+- `get()` now returns a shallow-frozen `Readonly<BunaryConfig>` to prevent accidental mutation (#35)
+- Runtime validation: `defineConfig()` throws if `app.name` is empty or whitespace-only (#37)
+- Tests for module augmentation property passthrough (#38)
+
+### Changed
+
+- Removed duplicated `OrmConfig` type — config extensibility via module augmentation instead
+- `defineConfig()` uses spread to pass through augmented properties (e.g. `orm` from `@bunary/orm`)
+- `BunaryConfigStore.get()` return type is now `Readonly<BunaryConfig>`
+
 ## [0.1.0] - 2026-01-31
 
 ### Added

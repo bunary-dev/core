@@ -146,6 +146,27 @@ describe("defineConfig()", () => {
     );
   });
 
+  it("throws when app.name is a number", () => {
+    // biome-ignore lint/suspicious/noExplicitAny: testing JS runtime safety
+    expect(() => defineConfig({ app: { name: 123 as any } })).toThrow(
+      "BunaryConfig: app.name is required",
+    );
+  });
+
+  it("throws when app.name is undefined", () => {
+    // biome-ignore lint/suspicious/noExplicitAny: testing JS runtime safety
+    expect(() => defineConfig({ app: { name: undefined as any } })).toThrow(
+      "BunaryConfig: app.name is required",
+    );
+  });
+
+  it("throws when app.name is null", () => {
+    // biome-ignore lint/suspicious/noExplicitAny: testing JS runtime safety
+    expect(() => defineConfig({ app: { name: null as any } })).toThrow(
+      "BunaryConfig: app.name is required",
+    );
+  });
+
   it("preserves augmented properties through defineConfig", () => {
     const ormConfig = {
       database: { type: "sqlite" as const, sqlite: { path: "./test.db" } },
@@ -239,6 +260,28 @@ describe("createConfig()", () => {
       // biome-ignore lint/suspicious/noExplicitAny: testing mutation safety
       (config as any).app = { name: "Mutated" };
     }).toThrow();
+  });
+
+  it("deep-freezes nested objects from get()", () => {
+    const cfg = createConfig(defineConfig({ app: { name: "Deep" } }));
+    const config = cfg.get();
+
+    expect(Object.isFrozen(config.app)).toBe(true);
+    expect(() => {
+      // biome-ignore lint/suspicious/noExplicitAny: testing nested mutation safety
+      (config.app as any).name = "Mutated";
+    }).toThrow();
+  });
+
+  it("get() returns a snapshot that does not leak internal state", () => {
+    const cfg = createConfig(defineConfig({ app: { name: "Snap" } }));
+    const first = cfg.get();
+
+    cfg.set({ app: { name: "Updated" } });
+    const second = cfg.get();
+
+    expect(first.app.name).toBe("Snap");
+    expect(second.app.name).toBe("Updated");
   });
 
   it("has() returns false before set()", () => {

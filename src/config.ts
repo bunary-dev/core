@@ -10,6 +10,24 @@ function normalizeEnv(value: unknown): BunaryConfig["app"]["env"] {
 }
 
 /**
+ * Recursively freeze an object and all nested objects.
+ * Arrays and plain objects are frozen; primitives and functions are skipped.
+ */
+function deepFreeze<T>(obj: T): Readonly<T> {
+  Object.freeze(obj);
+  for (const value of Object.values(obj as Record<string, unknown>)) {
+    if (
+      value !== null &&
+      typeof value === "object" &&
+      !Object.isFrozen(value)
+    ) {
+      deepFreeze(value);
+    }
+  }
+  return obj;
+}
+
+/**
  * Instance-scoped configuration container.
  *
  * This replaces global mutable config and allows multiple independent app instances
@@ -59,7 +77,7 @@ export function createConfig(initial?: BunaryConfig): BunaryConfigStore {
       if (!current) {
         throw new Error("Bunary configuration not set. Call set() first.");
       }
-      return Object.freeze({ ...current });
+      return deepFreeze({ ...current });
     },
     has: (): boolean => {
       return current !== null;
@@ -94,7 +112,7 @@ export function createConfig(initial?: BunaryConfig): BunaryConfigStore {
  * ```
  */
 export function defineConfig(config: BunaryConfig): BunaryConfig {
-  if (!config.app.name || !config.app.name.trim()) {
+  if (typeof config.app.name !== "string" || !config.app.name.trim()) {
     throw new Error("BunaryConfig: app.name is required");
   }
 

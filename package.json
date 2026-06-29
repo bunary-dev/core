@@ -42,7 +42,7 @@
     "bun": ">=1.0.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.15",
+    "@biomejs/biome": "2.5.1",
     "bun-types": "latest"
   }
 }

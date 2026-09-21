@@ -72,6 +72,16 @@ export type ConfigPath =
  *
  * Standard Schema objects take an `unknown` input, because coercing schemas
  * declare an input wider than the config interface.
+ *
+ * @example
+ * ```ts
+ * import type { ConfigSchema } from "@bunary/core";
+ * import { z } from "zod";
+ *
+ * const schema: ConfigSchema<{ app: { name: string } }> = z.object({
+ *   app: z.object({ name: z.string().min(1) }),
+ * });
+ * ```
  */
 export type ConfigSchema<Output extends BunaryConfig> =
   | StandardSchemaV1<unknown, Output>

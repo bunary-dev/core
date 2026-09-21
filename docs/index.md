@@ -44,7 +44,48 @@ export const configStore = createConfig(
 export default configStore.get();
 ```
 
+### Application
+
+```typescript
+import { createApp, createToken, MissingBindingError } from "@bunary/core";
+
+const DB = createToken<{ url: string }>("db");
+
+const app = createApp({ config: { app: { name: "MyApp" } } });
+app.set(DB, { url: "postgres://localhost/app" });
+
+await app.boot();
+
+app.get(DB).url; // typed as string
+```
+
+Two apps created in one process share no config and no bindings.
+
 ## API
+
+### createApp(options: CreateAppOptions): Application
+
+Create an instance-scoped application. `options.config` is validated through `defineConfig`, so an invalid config throws here. Returns an unbooted `Application`:
+
+- `config` — this app's `BunaryConfigStore`.
+- `env` — the environment this app runs in.
+- `set(token, value)` — bind a value to a token; returns the app for chaining. Allowed after boot, but providers should register before boot.
+- `get(token)` — read a binding, typed by the token; throws `MissingBindingError` when unset.
+- `has(token)` — `true` when a value is bound, even a nullish one.
+- `boot()` — idempotent; repeated calls return the same promise and boot runs once.
+- `booted` — `true` once `boot()` has completed.
+
+### createToken\<T\>(name: string): Token\<T\>
+
+Create a typed registry key. Identity is the token object, never its name: two `createToken("db")` calls are two distinct keys. `name` is used only in error messages.
+
+### BunaryError
+
+Base class for every error thrown by Bunary; supports the standard `cause` option.
+
+### MissingBindingError
+
+Thrown by `Application.get` when nothing is bound. Carries the offending `token` and the message `No binding registered for token "db"`.
 
 ### env\<T\>(key: string, defaultValue?: T): T
 

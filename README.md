@@ -1,6 +1,6 @@
 # @bunary/core
 
-Foundation for the Bunary framework: config (defineConfig, createConfig), environment (env, isDev, isProd, isTest). Full reference: [docs/index.md](./docs/index.md).
+Foundation for the Bunary framework: application (createApp, createToken), config (defineConfig, createConfig), environment (env, isDev, isProd, isTest). Full reference: [docs/index.md](./docs/index.md).
 
 ## Installation
 
@@ -13,11 +13,16 @@ bun add @bunary/core
 ## Quick start
 
 ```typescript
-import { env, createConfig, defineConfig } from "@bunary/core";
+import { createApp, createToken, env } from "@bunary/core";
 
-const port = env("PORT", 3000);
-const configStore = createConfig(defineConfig({ app: { name: "MyApp", env: "development", debug: true } }));
-export default configStore.get();
+const PORT = createToken<number>("port");
+
+const app = createApp({ config: { app: { name: "MyApp", env: "development", debug: true } } });
+app.set(PORT, env("PORT", 3000));
+
+await app.boot();
+
+export default app;
 ```
 
 For API details, see [docs/index.md](./docs/index.md).

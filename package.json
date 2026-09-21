@@ -22,8 +22,8 @@
     "build": "bun build ./src/index.ts --outdir ./dist --target bun && tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
-    "lint": "biome check ./src ./tests",
-    "format": "biome check --write ./src ./tests",
+    "lint": "biome check ./src ./tests ./examples",
+    "format": "biome check --write ./src ./tests ./examples",
     "pack:check": "bun pm pack --dry-run"
   },
   "keywords": [

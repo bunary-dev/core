@@ -285,4 +285,23 @@ describe("Application boot()", () => {
     expect(results).toEqual([app, app, app]);
     expect(app.booted).toBe(true);
   });
+
+  it("runs the declared providers (see tests/provider.test.ts)", async () => {
+    const token = createToken<string>("provided");
+    const app = createApp({
+      config: { app: { name: "MyApp" } },
+      providers: [
+        {
+          name: "binder",
+          register: (a) => {
+            a.set(token, "bound");
+          },
+        },
+      ],
+    });
+
+    await app.boot();
+
+    expect(app.get(token)).toBe("bound");
+  });
 });

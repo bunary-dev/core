@@ -2,7 +2,18 @@ import type { Command } from "./command.js";
 import type { EnvironmentType } from "./constants.js";
 
 /**
- * App configuration
+ * App configuration.
+ *
+ * @example
+ * ```ts
+ * import type { AppConfig } from "@bunary/core";
+ *
+ * const app: AppConfig = {
+ *   name: "MyApp",
+ *   env: "production",
+ *   debug: false,
+ * };
+ * ```
  */
 export interface AppConfig {
   /** Application name */

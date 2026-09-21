@@ -10,6 +10,22 @@
 import type { StandardSchemaV1 } from "@standard-schema/spec";
 import { BunaryError } from "./errors.js";
 
+/**
+ * Re-export of the [Standard Schema](https://standardschema.dev) spec type.
+ *
+ * Implemented by zod, valibot, arktype and other validators; core depends on
+ * this type only, never on a specific library.
+ *
+ * @example
+ * ```ts
+ * import type { StandardSchemaV1 } from "@bunary/core";
+ * import { z } from "zod";
+ *
+ * const schema: StandardSchemaV1<unknown, { PORT: number }> = z.object({
+ *   PORT: z.coerce.number(),
+ * });
+ * ```
+ */
 export type { StandardSchemaV1 };
 
 /**
@@ -35,7 +51,25 @@ export type SchemaLike<Input = unknown, Output = Input> =
   | StandardSchemaV1<Input, Output>
   | ((input: Input) => Output);
 
-/** A single validation failure, with a dot-joined path. */
+/**
+ * A single validation failure, with a dot-joined path.
+ *
+ * @example
+ * ```ts
+ * import { validateWith, ValidationError, type ValidationIssue } from "@bunary/core";
+ * import { z } from "zod";
+ *
+ * try {
+ *   validateWith(z.object({ PORT: z.number() }), {}, "Environment");
+ * } catch (error) {
+ *   if (error instanceof ValidationError) {
+ *     const issue: ValidationIssue = error.issues[0]!;
+ *     issue.path;    // "PORT"
+ *     issue.message; // validator's own message
+ *   }
+ * }
+ * ```
+ */
 export interface ValidationIssue {
   /** Dot-joined path to the offending value, or `"(root)"`. */
   readonly path: string;

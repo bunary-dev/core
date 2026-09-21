@@ -1,6 +1,6 @@
 # @bunary/core
 
-Foundation for the Bunary framework: application (createApp, createToken), config (defineConfig, createConfig), environment (defineEnv, env, environment, resolveEnvironment, isDev, isProd, isTest), validation contract (validateWith, ValidationError). Full reference: [docs/index.md](./docs/index.md).
+Foundation for the Bunary framework: application (createApp, createToken), config (defineConfig, createConfig, ConfigRepository), environment (defineEnv, env, environment, resolveEnvironment, isDev, isProd, isTest), validation contract (validateWith, ValidationError). Full reference: [docs/index.md](./docs/index.md).
 
 ## Installation
 
@@ -27,6 +27,7 @@ app.set(PORT, appEnv.PORT);
 await app.boot();
 
 app.env; // APP_ENV -> NODE_ENV -> "development"
+app.config.get("app.name"); // dot-path reads, plus has() and filled()
 
 export default app;
 ```

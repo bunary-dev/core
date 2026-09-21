@@ -1,0 +1,21 @@
+# Proves the published artifact is usable by a real consumer: packs the package,
+# installs the tarball into a fresh TypeScript project, type-checks an import of
+# every exports subpath under `moduleResolution: node16`, and imports each one at
+# runtime with bun.
+#
+# The workflow body lives in bunary-dev/.github so every package repo shares one
+# definition. See bunary-dev/.github#8.
+name: Consumer smoke test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  consumer-smoke-test:
+    uses: bunary-dev/.github/.github/workflows/consumer-smoke-test.yml@main

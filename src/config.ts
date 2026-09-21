@@ -1,6 +1,6 @@
 import { Environment } from "./constants.js";
 import { env as envVar } from "./environment.js";
-import type { BunaryConfig } from "./types";
+import type { BunaryConfig } from "./types.js";
 
 function normalizeEnv(value: unknown): BunaryConfig["app"]["env"] {
   if (value === Environment.DEVELOPMENT) return Environment.DEVELOPMENT;

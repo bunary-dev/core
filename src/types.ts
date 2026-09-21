@@ -1,3 +1,4 @@
+import type { Command } from "./command.js";
 import type { EnvironmentType } from "./constants.js";
 
 /**
@@ -31,4 +32,6 @@ export interface AppConfig {
  */
 export interface BunaryConfig {
   app: AppConfig;
+  /** Custom CLI commands registered by this project */
+  commands?: Command[];
 }

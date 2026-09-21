@@ -3,6 +3,7 @@
  * Foundation module for Bunary - config, environment, and app helpers
  */
 
+export type { Command, CommandArg, CommandFlag } from "./command.js";
 export {
   clearBunaryConfig,
   createConfig,

@@ -7,14 +7,15 @@ export {
   type Application,
   type CreateAppOptions,
   createApp,
-} from "./application";
+} from "./application.js";
+export type { Command, CommandArg, CommandFlag } from "./command.js";
 export {
   clearBunaryConfig,
   createConfig,
   defineConfig,
   getBunaryConfig,
-} from "./config";
-export { Environment, type EnvironmentType } from "./constants";
+} from "./config.js";
+export { Environment, type EnvironmentType } from "./constants.js";
 export {
   defineEnv,
   type EnvOf,
@@ -24,14 +25,14 @@ export {
   isProd,
   isTest,
   resolveEnvironment,
-} from "./environment";
-export { BunaryError, MissingBindingError } from "./errors";
+} from "./environment.js";
+export { BunaryError, MissingBindingError } from "./errors.js";
 export {
   type SchemaLike,
   type StandardSchemaV1,
   ValidationError,
   type ValidationIssue,
   validateWith,
-} from "./schema";
-export { createToken, type Token } from "./token";
-export type { AppConfig, BunaryConfig } from "./types";
+} from "./schema.js";
+export { createToken, type Token } from "./token.js";
+export type { AppConfig, BunaryConfig } from "./types.js";

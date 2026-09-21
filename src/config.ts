@@ -1,5 +1,5 @@
 import { env as envVar, resolveEnvironment } from "./environment.js";
-import type { BunaryConfig } from "./types";
+import type { BunaryConfig } from "./types.js";
 
 /**
  * Recursively freeze an object and all nested objects.

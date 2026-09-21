@@ -188,6 +188,63 @@ A positional argument accepted by a `Command`.
 
 A flag (e.g. `--dry-run` / `-d`) accepted by a `Command`.
 
+## Providers
+
+A provider is a plain object with two optional hooks; no class, base class or decorator is required.
+
+```typescript
+import { createApp, createToken, defineProvider } from "@bunary/core";
+
+const DB = createToken<{ url: string }>("db");
+
+const databaseProvider = defineProvider({
+  name: "database",
+  register(app) {
+    app.set(DB, { url: "postgres://localhost/app" });
+  },
+  async boot(app) {
+    await Promise.resolve(app.get(DB).url);
+  },
+});
+
+const app = createApp({
+  config: { app: { name: "MyApp" } },
+  providers: [databaseProvider],
+});
+
+await app.boot();
+```
+
+`app.boot()` runs every `register` in declaration order, synchronously and in one pass, then every `boot` in declaration order, awaiting each one before the next. There is no dependency graph: ordering is the array you wrote. `booted` flips to `true` only once every `boot` has resolved.
+
+Binding with `app.set()` after boot still works, but providers should register before boot so everything that boots can rely on their bindings.
+
+### Failure semantics
+
+- A `register` that returns a promise rejects `boot()` with a `BunaryError` naming the provider. Move async work into `boot`.
+- A hook that throws or rejects rejects `boot()`. A `BunaryError` (including `MissingBindingError`) passes through unchanged; anything else is wrapped in a `BunaryError` naming the provider and the hook, with the original kept as `cause`.
+- A failed boot is permanent: `booted` stays `false` and every later `boot()` returns the same rejected promise. An app that failed to boot is dead — create a new one.
+
+### Provider
+
+```typescript
+interface Provider {
+  readonly name?: string;
+  register?(app: Application): void;
+  boot?(app: Application): void | Promise<void>;
+}
+```
+
+`name` is used in error messages only; an unnamed provider is reported by its index.
+
+### defineProvider(provider: Provider): Provider
+
+Identity helper: returns the object it was given. It exists for authoring — the contextual type means `app` is typed inside the hooks and a mistyped hook name is caught where you wrote it rather than at boot.
+
+### Application.use(provider: Provider): this
+
+Append a provider to the declaration order. Valid only before boot starts; calling it once `boot()` has been called throws a `BunaryError`, because `register` would otherwise run after other providers had already booted.
+
 ## Requirements
 
 Bun ≥ 1.4.0

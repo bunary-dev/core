@@ -27,6 +27,7 @@ export {
   resolveEnvironment,
 } from "./environment.js";
 export { BunaryError, MissingBindingError } from "./errors.js";
+export { defineProvider, type Provider } from "./provider.js";
 export {
   type SchemaLike,
   type StandardSchemaV1,

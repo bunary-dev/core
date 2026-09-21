@@ -35,6 +35,35 @@ export default app;
 
 For API details, see [docs/index.md](./docs/index.md).
 
+## Providers
+
+A provider is a plain object with two optional hooks. `register` is synchronous and only binds tokens; `boot` may be async and may read them. `app.boot()` runs every `register` in declaration order, then every `boot` in declaration order, awaiting each one.
+
+```typescript
+import { createApp, createToken, defineProvider } from "@bunary/core";
+
+const DB = createToken<{ url: string }>("db");
+
+const databaseProvider = defineProvider({
+  name: "database",
+  register(app) {
+    app.set(DB, { url: Bun.env.DATABASE_URL ?? "postgres://localhost/app" });
+  },
+  async boot(app) {
+    await Promise.resolve(app.get(DB).url); // connect, migrate, warm caches
+  },
+});
+
+const app = createApp({
+  config: { app: { name: "MyApp" } },
+  providers: [databaseProvider],
+});
+
+await app.boot(); // register:database, then boot:database
+```
+
+No dependency graph: ordering is the array you wrote. See [docs/index.md](./docs/index.md) for `Application.use()` and the failure semantics.
+
 ## License
 
 MIT

@@ -10,6 +10,7 @@ import type { BunaryConfig } from "../src/types";
 
 describe("defineConfig()", () => {
   const originalNodeEnv = Bun.env.NODE_ENV;
+  const originalAppEnv = Bun.env.APP_ENV;
   const originalDebug = Bun.env.DEBUG;
 
   afterEach(() => {
@@ -17,6 +18,12 @@ describe("defineConfig()", () => {
       delete Bun.env.NODE_ENV;
     } else {
       Bun.env.NODE_ENV = originalNodeEnv;
+    }
+
+    if (originalAppEnv === undefined) {
+      delete Bun.env.APP_ENV;
+    } else {
+      Bun.env.APP_ENV = originalAppEnv;
     }
 
     if (originalDebug === undefined) {
@@ -39,17 +46,34 @@ describe("defineConfig()", () => {
   });
 
   it("defaults env to current NODE_ENV when not specified", () => {
-    // Note: During tests, NODE_ENV is 'test', so it defaults to that
+    delete Bun.env.APP_ENV;
+    Bun.env.NODE_ENV = "production";
+
     const config = defineConfig({
       app: {
         name: "TestApp",
       },
     });
 
-    // Should match current NODE_ENV (which is 'test' during bun test)
-    expect(config.app.env).toBe(
-      Bun.env.NODE_ENV === "test" ? Environment.TEST : Environment.DEVELOPMENT,
-    );
+    expect(config.app.env).toBe(Environment.PRODUCTION);
+  });
+
+  it("prefers APP_ENV over NODE_ENV when env is not specified", () => {
+    Bun.env.APP_ENV = "test";
+    Bun.env.NODE_ENV = "production";
+
+    const config = defineConfig({ app: { name: "TestApp" } });
+
+    expect(config.app.env).toBe(Environment.TEST);
+  });
+
+  it("defaults env to development when nothing is set", () => {
+    delete Bun.env.APP_ENV;
+    delete Bun.env.NODE_ENV;
+
+    const config = defineConfig({ app: { name: "TestApp" } });
+
+    expect(config.app.env).toBe(Environment.DEVELOPMENT);
   });
 
   it("prefers explicit config env over NODE_ENV", () => {
@@ -109,18 +133,30 @@ describe("defineConfig()", () => {
     expect(testConfig.app.env).toBe("test");
   });
 
-  it("falls back to development when NODE_ENV is invalid", () => {
+  it("throws when NODE_ENV is invalid", () => {
+    delete Bun.env.APP_ENV;
     Bun.env.NODE_ENV = "staging";
-    const config = defineConfig({ app: { name: "TestApp" } });
-    expect(config.app.env).toBe("development");
+    expect(() => defineConfig({ app: { name: "TestApp" } })).toThrow(
+      'Unknown environment "staging" (expected development, production, test)',
+    );
   });
 
-  it("falls back to development when config.app.env is invalid", () => {
-    const config = defineConfig({
-      // biome-ignore lint/suspicious/noExplicitAny: testing runtime validation
-      app: { name: "TestApp", env: "staging" as any },
-    });
-    expect(config.app.env).toBe("development");
+  it("throws when APP_ENV is invalid", () => {
+    Bun.env.APP_ENV = "qa";
+    expect(() => defineConfig({ app: { name: "TestApp" } })).toThrow(
+      'Unknown environment "qa" (expected development, production, test)',
+    );
+  });
+
+  it("throws when config.app.env is invalid", () => {
+    expect(() =>
+      defineConfig({
+        // biome-ignore lint/suspicious/noExplicitAny: testing runtime validation
+        app: { name: "TestApp", env: "staging" as any },
+      }),
+    ).toThrow(
+      'Unknown environment "staging" (expected development, production, test)',
+    );
   });
 
   it("parses DEBUG=1 as true", () => {

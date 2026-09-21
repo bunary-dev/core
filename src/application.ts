@@ -6,7 +6,7 @@
  * one process (tests, workers, a CLI driving two projects).
  */
 
-import { type BunaryConfigStore, createConfig } from "./config.js";
+import { type ConfigRepository, createConfig } from "./config.js";
 import type { EnvironmentType } from "./constants.js";
 import { resolveEnvironment } from "./environment.js";
 import { MissingBindingError } from "./errors.js";
@@ -35,7 +35,7 @@ export interface CreateAppOptions {
 /**
  * An instance-scoped Bunary application.
  *
- * Holds this app's config store, resolved environment and token registry.
+ * Holds this app's config repository, resolved environment and token registry.
  * The environment comes from `config.app.env`, then `APP_ENV`, then
  * `NODE_ENV`, then `development`.
  * No global state, no container, no facades: you hold the instance, or you
@@ -58,8 +58,8 @@ export interface CreateAppOptions {
  * ```
  */
 export interface Application {
-  /** This app's config store, built from `options.config`. */
-  readonly config: BunaryConfigStore;
+  /** This app's config repository, built from `options.config`. */
+  readonly config: ConfigRepository;
   /** The environment this app runs in. */
   readonly env: EnvironmentType;
   /** Whether {@link Application.boot} has completed. */
@@ -102,7 +102,7 @@ export interface Application {
 }
 
 class BunaryApplication implements Application {
-  readonly config: BunaryConfigStore;
+  readonly config: ConfigRepository;
   readonly env: EnvironmentType;
 
   readonly #bindings = new Map<Token<unknown>, unknown>();

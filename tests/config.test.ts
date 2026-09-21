@@ -266,8 +266,9 @@ describe("defineConfig(schema, values)", () => {
     ).toThrow(ValidationError);
 
     try {
-      defineConfig(schema, { app: { name: "Schema" } } as unknown as
-        BunaryConfig);
+      defineConfig(schema, {
+        app: { name: "Schema" },
+      } as unknown as BunaryConfig);
       expect.unreachable("defineConfig should have thrown");
     } catch (error) {
       expect(error).toBeInstanceOf(ValidationError);
@@ -292,9 +293,12 @@ describe("defineConfig(schema, values)", () => {
 
   it("wraps a throwing plain function in a ValidationError", () => {
     expect(() =>
-      defineConfig((): BunaryConfig => {
-        throw new Error("no good");
-      }, { app: { name: "Fn" } }),
+      defineConfig(
+        (): BunaryConfig => {
+          throw new Error("no good");
+        },
+        { app: { name: "Fn" } },
+      ),
     ).toThrow("Config validation failed: (root): no good");
   });
 

@@ -1,6 +1,6 @@
 {
   "name": "@bunary/core",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Foundation module for Bunary - config, environment, and app helpers",
   "type": "module",
   "main": "./dist/index.js",
@@ -8,18 +8,23 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "dist"
   ],
+  "sideEffects": false,
   "scripts": {
-    "build": "bun build ./src/index.ts --outdir ./dist --target bun && bunx tsc -p tsconfig.build.json",
-    "typecheck": "bunx tsc --noEmit",
+    "build": "bun build ./src/index.ts --outdir ./dist --target bun && tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
     "test": "bun test",
-    "lint": "bunx biome check ./src"
+    "lint": "biome check ./src ./tests",
+    "format": "biome check --write ./src ./tests",
+    "pack:check": "bun pm pack --dry-run"
   },
   "keywords": [
     "bunary",
@@ -38,11 +43,15 @@
   "bugs": {
     "url": "https://github.com/bunary-dev/core/issues"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
-    "bun": ">=1.0.0"
+    "bun": ">=1.4.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.15",
-    "bun-types": "latest"
+    "@biomejs/biome": "2.5.1",
+    "@types/bun": "^1.4.2",
+    "typescript": "^7.0.2"
   }
 }

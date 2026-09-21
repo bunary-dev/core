@@ -75,7 +75,7 @@ Create an instance-scoped configuration store with `get()`, `set()`, `has()`, an
 
 ## Requirements
 
-Bun ≥ 1.0.0
+Bun ≥ 1.4.0
 
 ## License
 

@@ -3,7 +3,7 @@
  * TDD: Testing env(), isDev(), isProd(), isTest()
  */
 
-import { describe, expect, it, beforeEach, afterEach } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { env, isDev, isProd, isTest } from "../src/environment";
 
 describe("env()", () => {

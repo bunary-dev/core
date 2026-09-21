@@ -4,6 +4,8 @@ Foundation for the Bunary framework: config (defineConfig, createConfig), enviro
 
 ## Installation
 
+Requires Bun ≥ 1.4.0.
+
 ```bash
 bun add @bunary/core
 ```

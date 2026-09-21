@@ -4,8 +4,9 @@
  */
 
 import { afterEach, describe, expect, it } from "bun:test";
-import { defineConfig, createConfig, getBunaryConfig } from "../src/config";
+import { createConfig, defineConfig, getBunaryConfig } from "../src/config";
 import { Environment } from "../src/constants";
+import type { BunaryConfig } from "../src/types";
 
 describe("defineConfig()", () => {
   const originalNodeEnv = Bun.env.NODE_ENV;
@@ -46,7 +47,9 @@ describe("defineConfig()", () => {
     });
 
     // Should match current NODE_ENV (which is 'test' during bun test)
-    expect(config.app.env).toBe(Bun.env.NODE_ENV === "test" ? Environment.TEST : Environment.DEVELOPMENT);
+    expect(config.app.env).toBe(
+      Bun.env.NODE_ENV === "test" ? Environment.TEST : Environment.DEVELOPMENT,
+    );
   });
 
   it("prefers explicit config env over NODE_ENV", () => {
@@ -93,8 +96,12 @@ describe("defineConfig()", () => {
   });
 
   it("accepts all valid env values", () => {
-    const devConfig = defineConfig({ app: { name: "Test", env: "development" } });
-    const prodConfig = defineConfig({ app: { name: "Test", env: "production" } });
+    const devConfig = defineConfig({
+      app: { name: "Test", env: "development" },
+    });
+    const prodConfig = defineConfig({
+      app: { name: "Test", env: "production" },
+    });
     const testConfig = defineConfig({ app: { name: "Test", env: "test" } });
 
     expect(devConfig.app.env).toBe("development");
@@ -173,14 +180,15 @@ describe("defineConfig()", () => {
     };
 
     // Simulate module augmentation — extra properties should pass through
-    const config = defineConfig({
+    const augmented = {
       app: { name: "TestApp" },
-      // biome-ignore lint/suspicious/noExplicitAny: testing augmented property passthrough
       orm: ormConfig,
-    } as any);
+    } as unknown as BunaryConfig;
+    const config = defineConfig(augmented) as BunaryConfig & {
+      orm?: typeof ormConfig;
+    };
 
-    // biome-ignore lint/suspicious/noExplicitAny: testing augmented property passthrough
-    expect((config as any).orm).toEqual(ormConfig);
+    expect(config.orm).toEqual(ormConfig);
   });
 });
 
@@ -211,7 +219,9 @@ describe("createConfig()", () => {
 
   it("throws when get() called before set()", () => {
     const cfg = createConfig();
-    expect(() => cfg.get()).toThrow("Bunary configuration not set. Call set() first.");
+    expect(() => cfg.get()).toThrow(
+      "Bunary configuration not set. Call set() first.",
+    );
   });
 
   it("can be cleared without affecting other instances", () => {
@@ -220,7 +230,9 @@ describe("createConfig()", () => {
 
     cfgA.clear();
 
-    expect(() => cfgA.get()).toThrow("Bunary configuration not set. Call set() first.");
+    expect(() => cfgA.get()).toThrow(
+      "Bunary configuration not set. Call set() first.",
+    );
     expect(cfgB.get().app.name).toBe("B");
   });
 

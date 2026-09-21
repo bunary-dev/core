@@ -13,6 +13,16 @@ import {
   validateWith,
 } from "../src/schema";
 
+/**
+ * Widen a schema's declared input so a test can feed it invalid values.
+ * Standard Schema validators accept `unknown` at runtime regardless.
+ */
+function widen<S extends StandardSchemaV1>(
+  schema: S,
+): SchemaLike<unknown, StandardSchemaV1.InferOutput<S>> {
+  return schema as SchemaLike<unknown, StandardSchemaV1.InferOutput<S>>;
+}
+
 describe("validateWith() with a Standard Schema", () => {
   const schema = z.object({
     PORT: z.coerce.number(),
@@ -27,14 +37,14 @@ describe("validateWith() with a Standard Schema", () => {
   });
 
   it("throws a ValidationError on failure", () => {
-    expect(() => validateWith(schema, { PORT: "nope", NAME: 1 })).toThrow(
-      ValidationError,
-    );
+    expect(() =>
+      validateWith(widen(schema), { PORT: "nope", NAME: 1 }),
+    ).toThrow(ValidationError);
   });
 
   it("ValidationError extends BunaryError", () => {
     try {
-      validateWith(schema, {});
+      validateWith(widen(schema), {});
       expect.unreachable();
     } catch (error) {
       expect(error).toBeInstanceOf(BunaryError);
@@ -46,7 +56,7 @@ describe("validateWith() with a Standard Schema", () => {
     const nested = z.object({ db: z.object({ url: z.string() }) });
 
     try {
-      validateWith(nested, { db: {} });
+      validateWith(widen(nested), { db: {} });
       expect.unreachable();
     } catch (error) {
       const issues = (error as ValidationError).issues;
@@ -57,7 +67,7 @@ describe("validateWith() with a Standard Schema", () => {
 
   it("defaults the message prefix to 'Validation failed'", () => {
     try {
-      validateWith(z.object({ PORT: z.number() }), {});
+      validateWith(widen(z.object({ PORT: z.number() })), {});
       expect.unreachable();
     } catch (error) {
       expect((error as ValidationError).message).toStartWith(
@@ -68,7 +78,7 @@ describe("validateWith() with a Standard Schema", () => {
 
   it("uses the context label as the message prefix", () => {
     try {
-      validateWith(z.object({ PORT: z.number() }), {}, "Environment");
+      validateWith(widen(z.object({ PORT: z.number() })), {}, "Environment");
       expect.unreachable();
     } catch (error) {
       expect((error as ValidationError).message).toStartWith(
@@ -79,7 +89,11 @@ describe("validateWith() with a Standard Schema", () => {
 
   it("lists every issue separated by '; '", () => {
     try {
-      validateWith(z.object({ A: z.string(), B: z.string() }), {}, "Config");
+      validateWith(
+        widen(z.object({ A: z.string(), B: z.string() })),
+        {},
+        "Config",
+      );
       expect.unreachable();
     } catch (error) {
       const message = (error as ValidationError).message;
@@ -142,7 +156,7 @@ describe("validateWith() with a Standard Schema", () => {
 
   it("freezes the issues array", () => {
     try {
-      validateWith(z.object({ PORT: z.number() }), {});
+      validateWith(widen(z.object({ PORT: z.number() })), {});
       expect.unreachable();
     } catch (error) {
       expect(Object.isFrozen((error as ValidationError).issues)).toBe(true);
@@ -178,7 +192,6 @@ describe("validateWith() with a plain function", () => {
 
   it("wraps a thrown non-Error value", () => {
     const parse = (): never => {
-      // biome-ignore lint/complexity/noUselessUndefined: testing non-Error throws
       throw "boom";
     };
 

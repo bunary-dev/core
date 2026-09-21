@@ -7,7 +7,8 @@
  */
 
 import { type BunaryConfigStore, createConfig } from "./config.js";
-import { Environment, type EnvironmentType } from "./constants.js";
+import type { EnvironmentType } from "./constants.js";
+import { resolveEnvironment } from "./environment.js";
 import { MissingBindingError } from "./errors.js";
 import type { Token } from "./token.js";
 import type { BunaryConfig } from "./types.js";
@@ -35,6 +36,8 @@ export interface CreateAppOptions {
  * An instance-scoped Bunary application.
  *
  * Holds this app's config store, resolved environment and token registry.
+ * The environment comes from `config.app.env`, then `APP_ENV`, then
+ * `NODE_ENV`, then `development`.
  * No global state, no container, no facades: you hold the instance, or you
  * do not reach it.
  *
@@ -108,8 +111,7 @@ class BunaryApplication implements Application {
 
   constructor(options: CreateAppOptions) {
     this.config = createConfig(options.config);
-    // #59 replaces this with APP_ENV -> NODE_ENV resolution.
-    this.env = this.config.get().app.env ?? Environment.DEVELOPMENT;
+    this.env = resolveEnvironment(this.config.get().app.env);
   }
 
   get booted(): boolean {
@@ -156,7 +158,8 @@ class BunaryApplication implements Application {
  *
  * @param options - The app's config
  * @returns A new, unbooted {@link Application}
- * @throws If the config is invalid (for example an empty `app.name`)
+ * @throws If the config is invalid (for example an empty `app.name`, or an
+ * unknown `app.env` / `APP_ENV` / `NODE_ENV` value)
  *
  * @example
  * ```ts

@@ -81,9 +81,9 @@ describe("env()", () => {
     expect(env("BOOL_VAR", false)).toBe(true);
   });
 
-  it("coerces other strings to boolean false when default is boolean", () => {
+  it("coerces unrecognised strings to the boolean default", () => {
     Bun.env.BOOL_VAR = "nope";
-    expect(env("BOOL_VAR", true)).toBe(false);
+    expect(env("BOOL_VAR", false)).toBe(false);
   });
 
   // Type isolation tests - ensure types don't bleed into each other
@@ -162,21 +162,31 @@ describe("env() coercion edge cases (#48)", () => {
     expect(env("STR_VAR")).toBeUndefined();
   });
 
-  it.each(["TRUE", "True", "YES", "Yes", "On", "ON", "1"])(
-    "coerces %s to true",
-    (value) => {
-      Bun.env.BOOL_VAR = value;
-      expect(env("BOOL_VAR", false)).toBe(true);
-    },
-  );
+  it.each([
+    "TRUE",
+    "True",
+    "YES",
+    "Yes",
+    "On",
+    "ON",
+    "1",
+  ])("coerces %s to true", (value) => {
+    Bun.env.BOOL_VAR = value;
+    expect(env("BOOL_VAR", false)).toBe(true);
+  });
 
-  it.each(["FALSE", "False", "NO", "No", "Off", "OFF", "0"])(
-    "coerces %s to false",
-    (value) => {
-      Bun.env.BOOL_VAR = value;
-      expect(env("BOOL_VAR", true)).toBe(false);
-    },
-  );
+  it.each([
+    "FALSE",
+    "False",
+    "NO",
+    "No",
+    "Off",
+    "OFF",
+    "0",
+  ])("coerces %s to false", (value) => {
+    Bun.env.BOOL_VAR = value;
+    expect(env("BOOL_VAR", true)).toBe(false);
+  });
 
   it("returns the default for an unrecognised boolean value", () => {
     Bun.env.BOOL_VAR = "maybe";
@@ -453,6 +463,8 @@ describe("defineEnv()", () => {
       defineEnv(() => {
         throw new Error("DATABASE_URL is required");
       }, {}),
-    ).toThrow("Environment validation failed: (root): DATABASE_URL is required");
+    ).toThrow(
+      "Environment validation failed: (root): DATABASE_URL is required",
+    );
   });
 });

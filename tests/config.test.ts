@@ -4,7 +4,12 @@
  */
 
 import { afterEach, describe, expect, it } from "bun:test";
-import { createConfig, defineConfig, getBunaryConfig } from "../src/config";
+import {
+  clearBunaryConfig,
+  createConfig,
+  defineConfig,
+  getBunaryConfig,
+} from "../src/config";
 import { Environment } from "../src/constants";
 import type { BunaryConfig } from "../src/types";
 
@@ -233,6 +238,12 @@ describe("getBunaryConfig()", () => {
     expect(() => getBunaryConfig()).toThrow(
       "Global Bunary configuration has been removed. Create an instance config store with createConfig() and call store.get().",
     );
+  });
+});
+
+describe("clearBunaryConfig()", () => {
+  it("is a no-op now the global config is gone", () => {
+    expect(() => clearBunaryConfig()).not.toThrow();
   });
 });
 

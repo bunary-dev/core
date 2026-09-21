@@ -5,6 +5,32 @@ All notable changes to `@bunary/core` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0-rc.1] - 2026-09-22
+
+API freeze for the 1.0 line. Nothing is published to npm yet; the tag marks the contract. Epic: #61.
+
+### Added
+
+- `createApp()` / `Application`: instance-scoped app with `config`, `env`, `boot()`, `booted`, and a typed token registry (`set`/`get`/`has`); `createToken()`, `Token`; `BunaryError`, `MissingBindingError` (#56)
+- Service providers: `Provider` (`register` sync, `boot` async, declaration order, idempotent `boot()`), `defineProvider()`, `createApp({ providers })`, `app.use()` (#57)
+- `ConfigRepository` with dot-path `get()`/`has()`/`filled()`/`all()`, typed `ConfigPath` that grows with `BunaryConfig` augmentation, and `defineConfig(schema, values)` accepting any Standard Schema library or a plain function (#58, #41)
+- Environment: `resolveEnvironment()`/`environment()` read `APP_ENV`, then `NODE_ENV`, default `development`; unknown values throw. `defineEnv(schema)` validates `Bun.env` once and returns a typed, frozen object (#59)
+- `validateWith()`, `ValidationError`, `SchemaLike`, `StandardSchemaV1` re-export; `@standard-schema/spec` is the only runtime dependency (#59)
+- `Command`, `CommandArg`, `CommandFlag` types and `commands` on `BunaryConfig` (#40)
+- Guards: emitted `.d.ts` must use explicit import extensions (#55); every barrel export must carry a JSDoc `@example` (#50); in-repo example consumer exercising the whole public API (#60); consumer smoke-test workflow on every PR (#51)
+
+### Changed
+
+- `env()` coercion: empty/whitespace values count as unset; booleans are case-insensitive and accept true/false, 1/0, yes/no, on/off; numbers are trimmed (#48)
+- `app.debug` defaults from `APP_DEBUG`, falling back to `DEBUG` (#58)
+- Relative imports in `src/` carry `.js` extensions so declarations resolve under `moduleResolution: node16` (#55)
+- `createConfig()` now returns a `ConfigRepository` snapshot; it never freezes or mutates the caller's object (#58, #47)
+
+### Removed
+
+- **Breaking:** `getBunaryConfig()`, `clearBunaryConfig()`, the `BunaryConfigStore` interface and its `set()`/`clear()`, and deep-freezing of config objects. Build an app with `createApp({ config })` and read `app.config` instead (#58)
+- **Breaking:** unknown `app.env` / `NODE_ENV` values no longer fall back to `development`; they throw at `createApp()` (#59)
+
 ## [0.3.0] - 2026-09-21
 
 ### Changed

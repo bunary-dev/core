@@ -57,23 +57,47 @@ app.env; // config.app.env -> APP_ENV -> NODE_ENV -> "development"
 
 ### Configuration
 
-`createConfig()` returns an instance-scoped store, not the resolved config object. Use `configStore.get()` in app code to read the resolved config.
+One `bunary.config.ts` holds top-level namespaces (`app`, `http`, `orm`, ...). `createConfig()` returns a `ConfigRepository`: an immutable, instance-scoped snapshot with dot-path reads. `createApp()` builds one for you and exposes it as `app.config`.
 
 ```typescript
-import { createConfig, defineConfig } from "@bunary/core";
+import { createApp } from "@bunary/core";
 
-export const configStore = createConfig(
-  defineConfig({
-    app: {
-      name: "MyApp",
-      env: "development",
-      debug: true,
-    },
-  }),
-);
+const app = createApp({
+  config: {
+    app: { name: "MyApp", env: "development", debug: true },
+    http: { port: 3000, host: "" },
+  },
+});
 
-export default configStore.get();
+app.config.get().app.name;         // "MyApp" — the whole, typed config
+app.config.get("http.port");       // 3000
+app.config.get<number>("http.port"); // typed by the caller
+app.config.get("http.tls", false); // fallback for a missing path
+app.config.has("http.host");       // true — set, but empty
+app.config.filled("http.host");    // false — an empty string is not filled
 ```
+
+`has()` asks whether a key exists; `filled()` asks whether it holds anything. `null`, `undefined`, a blank string, an empty array and an empty object are unfilled; `false` and `0` are filled — they are real values.
+
+Pass a [Standard Schema](https://standardschema.dev) validator (zod, valibot, arktype) or a plain function to have the config validated once, at boot:
+
+```typescript
+import { defineConfig } from "@bunary/core";
+import { z } from "zod";
+
+export default defineConfig(
+  z.object({
+    app: z.object({ name: z.string().min(1) }),
+    http: z.object({ port: z.coerce.number() }),
+  }),
+  { app: { name: "MyApp" }, http: { port: Bun.env.PORT } },
+);
+// A bad PORT throws ValidationError: Config validation failed: http.port: ...
+```
+
+The repository never freezes and never mutates the object you hand it: it keeps a shallow copy of the top level and of `app`, and holds nested namespaces by reference. Treat those as read-only.
+
+There is no `set` and no `clear`, and no global config: the snapshot is built once, and you hold the repository or you do not reach it.
 
 ### Application
 
@@ -98,7 +122,7 @@ Two apps created in one process share no config and no bindings.
 
 Create an instance-scoped application. `options.config` is validated through `defineConfig`, so an invalid config throws here. Returns an unbooted `Application`:
 
-- `config` — this app's `BunaryConfigStore`.
+- `config` — this app's `ConfigRepository`.
 - `env` — the environment name this app runs in: `config.app.env`, then `APP_ENV`, then `NODE_ENV`, then `development`. An unknown value throws here.
 - `set(token, value)` — bind a value to a token; returns the app for chaining. Allowed after boot, but providers should register before boot.
 - `get(token)` — read a binding, typed by the token; throws `MissingBindingError` when unset.
@@ -165,16 +189,37 @@ Thrown when a schema rejects its input. Carries `issues: ReadonlyArray<{ path: s
 
 `SchemaLike` is `StandardSchemaV1<Input, Output> | ((input: Input) => Output)`. `StandardSchemaV1` is re-exported from [`@standard-schema/spec`](https://standardschema.dev) — core's only runtime dependency, and a types-only package, so core never bundles a validator.
 
-### defineConfig(config: BunaryConfig): BunaryConfig
+### defineConfig(values: BunaryConfig): BunaryConfig
+### defineConfig\<Output\>(schema: ConfigSchema\<Output\>, values: BunaryConfig): Output
 
-Type-safe configuration helper with defaults. Validates `app.name` is a non-empty string (throws for non-string values, empty strings, and whitespace-only strings). Resolves `app.env` through `resolveEnvironment`, so `app.env`, `APP_ENV` or `NODE_ENV` holding an unknown value throws rather than falling back to `development`. Passes through any augmented properties (e.g. `orm` from `@bunary/orm`).
+Type-safe configuration helper with defaults. Validates `app.name` is a non-empty string (throws `BunaryError` for non-string values, empty strings, and whitespace-only strings). Resolves `app.env` through `resolveEnvironment`, so `app.env`, `APP_ENV` or `NODE_ENV` holding an unknown value throws rather than falling back to `development`. Resolves `app.debug` from `APP_DEBUG`, falling back to `DEBUG`. Passes through any augmented namespaces (e.g. `orm` from `@bunary/orm`).
 
-### createConfig(config?: BunaryConfig): BunaryConfigStore
+With a schema, validation runs first and the schema's output is what gets normalised, so a coercing schema decides what the config actually holds. Failures throw `ValidationError` with a `Config validation failed: http.port: ...` message and structured `issues`. Neither form mutates the values it is given.
 
-Create an instance-scoped configuration store with `get()`, `set()`, `has()`, and `clear()`.
+### createConfig(values: BunaryConfig): ConfigRepository
 
-- `get()` returns a deep-frozen `Readonly<BunaryConfig>` — both the top-level object and all nested objects are immutable.
-- `has()` returns `true` if config has been set and not cleared.
+Normalise `values` through `defineConfig` and return this app's config repository. The caller's object is neither frozen nor mutated, and two repositories in one process share nothing.
+
+### ConfigRepository
+
+An immutable, instance-scoped snapshot. No `set`, no `clear`, no global accessor.
+
+- `get()` — the whole `BunaryConfig`; the same object on every call.
+- `get(path)` — the value at a dot-path, or `undefined`. Untyped by default; `get<T>(path)` types it.
+- `get(path, fallback)` — the value, or `fallback` when the path is missing or holds `undefined`. `false`, `0`, `""` and `null` are returned as themselves.
+- `has(path?)` — whether the key exists, even when empty. Without a path, whether any config is held (always `true` for a built repository).
+- `filled(path)` — whether the key exists *and* is non-empty: `null`, `undefined`, a blank string, an empty array and an empty plain object are unfilled.
+- `all()` — an alias of `get()`.
+
+Paths are dot-notation and walk plain objects and arrays: `"app.name"`, `"http.cors.origins"`, `"servers.0.host"`. Only own properties are visible, so `"app.toString"` is a miss.
+
+### ConfigPath
+
+The paths known to `BunaryConfig`, including those added by module augmentation, offered as editor completions. Any other string is still accepted, because a package may read a namespace whose types it does not import.
+
+### ConfigSchema\<Output\>
+
+`StandardSchemaV1<unknown, Output> | ((input: BunaryConfig) => Output)`, where `Output extends BunaryConfig` — what `defineConfig` accepts as a validator.
 
 ### Command
 

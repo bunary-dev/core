@@ -29,6 +29,12 @@ export interface AppConfig {
  *   }
  * }
  * ```
+ *
+ * `defineConfig(schema, values)` infers the shape of a single config from its
+ * schema, which is the right tool for one app's `bunary.config.ts`. It does
+ * not replace augmentation: a package declares the namespace it reads here,
+ * so `config.get("orm.host")` is known to every app that installs it,
+ * schema or not.
  */
 export interface BunaryConfig {
   app: AppConfig;

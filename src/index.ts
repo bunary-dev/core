@@ -10,10 +10,11 @@ export {
 } from "./application.js";
 export type { Command, CommandArg, CommandFlag } from "./command.js";
 export {
-  clearBunaryConfig,
+  type ConfigPath,
+  type ConfigRepository,
+  type ConfigSchema,
   createConfig,
   defineConfig,
-  getBunaryConfig,
 } from "./config.js";
 export { Environment, type EnvironmentType } from "./constants.js";
 export {

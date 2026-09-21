@@ -14,11 +14,12 @@ interface Db {
 }
 
 describe("createApp()", () => {
-  it("exposes a config store built from the given config", () => {
+  it("exposes a config repository built from the given config", () => {
     const app = createApp({ config: { app: { name: "MyApp" } } });
 
     expect(app.config.has()).toBe(true);
     expect(app.config.get().app.name).toBe("MyApp");
+    expect(app.config.get("app.name")).toBe("MyApp");
   });
 
   it("validates the config through defineConfig", () => {
@@ -119,11 +120,7 @@ describe("createApp()", () => {
 
     expect(first.config.get().app.name).toBe("First");
     expect(second.config.get().app.name).toBe("Second");
-
-    second.config.set({ app: { name: "Renamed" } });
-
-    expect(first.config.get().app.name).toBe("First");
-    expect(second.config.get().app.name).toBe("Renamed");
+    expect(first.config.get()).not.toBe(second.config.get());
   });
 
   it("does not share bindings between two apps in one process", () => {

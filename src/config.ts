@@ -1,13 +1,5 @@
-import { Environment } from "./constants.js";
-import { env as envVar } from "./environment.js";
+import { env as envVar, resolveEnvironment } from "./environment.js";
 import type { BunaryConfig } from "./types.js";
-
-function normalizeEnv(value: unknown): BunaryConfig["app"]["env"] {
-  if (value === Environment.DEVELOPMENT) return Environment.DEVELOPMENT;
-  if (value === Environment.PRODUCTION) return Environment.PRODUCTION;
-  if (value === Environment.TEST) return Environment.TEST;
-  return Environment.DEVELOPMENT;
-}
 
 /**
  * Recursively freeze an object and all nested objects.
@@ -91,13 +83,16 @@ export function createConfig(initial?: BunaryConfig): BunaryConfigStore {
 /**
  * Define Bunary configuration with type safety
  *
- * Validates `app.name` is non-empty and normalises `env` and `debug`.
+ * Validates `app.name` is non-empty and resolves `env` and `debug`. The
+ * environment comes from `app.env`, then `APP_ENV`, then `NODE_ENV`, then
+ * `development`; an unrecognised value throws rather than falling back.
  * Any additional properties added via module augmentation (e.g. `orm`
  * from `@bunary/orm`) are passed through unchanged.
  *
  * @param config - The configuration object
  * @returns The validated configuration
- * @throws If `app.name` is empty or whitespace-only
+ * @throws If `app.name` is empty or whitespace-only, or the environment is
+ * not one of `development`, `production`, `test`
  *
  * @example
  * ```ts
@@ -116,8 +111,6 @@ export function defineConfig(config: BunaryConfig): BunaryConfig {
     throw new Error("BunaryConfig: app.name is required");
   }
 
-  const rawEnv = config.app.env ?? Bun.env.NODE_ENV;
-
   // Extract app config, pass through any additional properties (orm, http, etc.)
   // These are added via module augmentation by other packages
   const { app, ...rest } = config;
@@ -126,7 +119,7 @@ export function defineConfig(config: BunaryConfig): BunaryConfig {
     ...rest,
     app: {
       name: app.name,
-      env: normalizeEnv(rawEnv),
+      env: resolveEnvironment(config.app.env),
       debug: app.debug ?? envVar("DEBUG", false),
     },
   };

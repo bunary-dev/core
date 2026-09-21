@@ -16,7 +16,23 @@ export {
   getBunaryConfig,
 } from "./config.js";
 export { Environment, type EnvironmentType } from "./constants.js";
-export { env, isDev, isProd, isTest } from "./environment.js";
+export {
+  defineEnv,
+  type EnvOf,
+  env,
+  environment,
+  isDev,
+  isProd,
+  isTest,
+  resolveEnvironment,
+} from "./environment.js";
 export { BunaryError, MissingBindingError } from "./errors.js";
+export {
+  type SchemaLike,
+  type StandardSchemaV1,
+  ValidationError,
+  type ValidationIssue,
+  validateWith,
+} from "./schema.js";
 export { createToken, type Token } from "./token.js";
 export type { AppConfig, BunaryConfig } from "./types.js";

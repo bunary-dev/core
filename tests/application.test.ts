@@ -3,7 +3,7 @@
  * TDD: Testing createApp()
  */
 
-import { describe, expect, it } from "bun:test";
+import { afterEach, describe, expect, it } from "bun:test";
 import { createApp } from "../src/application.js";
 import { Environment } from "../src/constants.js";
 import { MissingBindingError } from "../src/errors.js";
@@ -36,6 +36,81 @@ describe("createApp()", () => {
     });
 
     expect(app.env).toBe(Environment.PRODUCTION);
+  });
+
+  describe("environment resolution", () => {
+    const originalAppEnv = Bun.env.APP_ENV;
+    const originalNodeEnv = Bun.env.NODE_ENV;
+
+    afterEach(() => {
+      if (originalAppEnv === undefined) {
+        delete Bun.env.APP_ENV;
+      } else {
+        Bun.env.APP_ENV = originalAppEnv;
+      }
+
+      if (originalNodeEnv === undefined) {
+        delete Bun.env.NODE_ENV;
+      } else {
+        Bun.env.NODE_ENV = originalNodeEnv;
+      }
+    });
+
+    it("prefers the config value over APP_ENV", () => {
+      Bun.env.APP_ENV = "production";
+
+      const app = createApp({
+        config: { app: { name: "MyApp", env: Environment.TEST } },
+      });
+
+      expect(app.env).toBe(Environment.TEST);
+    });
+
+    it("falls back to APP_ENV when the config omits env", () => {
+      Bun.env.APP_ENV = "production";
+      Bun.env.NODE_ENV = "development";
+
+      const app = createApp({ config: { app: { name: "MyApp" } } });
+
+      expect(app.env).toBe(Environment.PRODUCTION);
+    });
+
+    it("falls back to NODE_ENV when APP_ENV is unset", () => {
+      delete Bun.env.APP_ENV;
+      Bun.env.NODE_ENV = "production";
+
+      const app = createApp({ config: { app: { name: "MyApp" } } });
+
+      expect(app.env).toBe(Environment.PRODUCTION);
+    });
+
+    it("defaults to development when nothing is set", () => {
+      delete Bun.env.APP_ENV;
+      delete Bun.env.NODE_ENV;
+
+      const app = createApp({ config: { app: { name: "MyApp" } } });
+
+      expect(app.env).toBe(Environment.DEVELOPMENT);
+    });
+
+    it("throws when the config env is unknown", () => {
+      expect(() =>
+        createApp({
+          // biome-ignore lint/suspicious/noExplicitAny: testing runtime validation
+          config: { app: { name: "MyApp", env: "staging" as any } },
+        }),
+      ).toThrow(
+        'Unknown environment "staging" (expected development, production, test)',
+      );
+    });
+
+    it("throws when APP_ENV is unknown", () => {
+      Bun.env.APP_ENV = "qa";
+
+      expect(() => createApp({ config: { app: { name: "MyApp" } } })).toThrow(
+        'Unknown environment "qa" (expected development, production, test)',
+      );
+    });
   });
 
   it("does not share config between two apps in one process", () => {

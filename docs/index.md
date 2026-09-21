@@ -114,6 +114,18 @@ Create an instance-scoped configuration store with `get()`, `set()`, `has()`, an
 - `get()` returns a deep-frozen `Readonly<BunaryConfig>` — both the top-level object and all nested objects are immutable.
 - `has()` returns `true` if config has been set and not cleared.
 
+### Command
+
+Shape of a CLI command; assign to `BunaryConfig.commands` to register project-defined commands.
+
+### CommandArg
+
+A positional argument accepted by a `Command`.
+
+### CommandFlag
+
+A flag (e.g. `--dry-run` / `-d`) accepted by a `Command`.
+
 ## Requirements
 
 Bun ≥ 1.4.0

@@ -8,7 +8,7 @@ export {
   createConfig,
   defineConfig,
   getBunaryConfig,
-} from "./config";
-export { Environment, type EnvironmentType } from "./constants";
-export { env, isDev, isProd, isTest } from "./environment";
-export type { AppConfig, BunaryConfig } from "./types";
+} from "./config.js";
+export { Environment, type EnvironmentType } from "./constants.js";
+export { env, isDev, isProd, isTest } from "./environment.js";
+export type { AppConfig, BunaryConfig } from "./types.js";

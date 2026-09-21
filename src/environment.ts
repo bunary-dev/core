@@ -1,4 +1,4 @@
-import { Environment } from "./constants";
+import { Environment } from "./constants.js";
 /**
  * Environment helpers using Bun.env
  */

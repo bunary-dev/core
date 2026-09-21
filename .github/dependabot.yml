@@ -1,7 +1,7 @@
-# Auto-generated 2026-05-17 per STANDARDS.md §4 — weekly + grouped + limit 5
+# Per STANDARDS.md §4 — weekly + grouped + limit 5. Uses the `bun` ecosystem so PRs update bun.lock (bunary-dev/.github#12)
 version: 2
 updates:
-  - package-ecosystem: npm
+  - package-ecosystem: bun
     directory: "/"
     schedule: { interval: weekly, day: monday }
     open-pull-requests-limit: 5

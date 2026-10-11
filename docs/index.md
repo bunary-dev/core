@@ -95,7 +95,9 @@ export default defineConfig(
 // A bad PORT throws ValidationError: Config validation failed: http.port: ...
 ```
 
-The repository never freezes and never mutates the object you hand it: it keeps a shallow copy of the top level and of `app`, and holds nested namespaces by reference. Treat those as read-only.
+The repository never freezes and never mutates the object you hand it: it keeps a frozen shallow copy of the top level and of `app`, so writing through `get()` throws, and holds nested namespaces by reference. Treat those as read-only.
+
+Config is the source of truth: it comes from `.env` and `bunary.config.ts` and does not change at runtime. Temporary or runtime values belong in the app's token bindings (`app.set(token, value)`), not in config.
 
 There is no `set` and no `clear`, and no global config: the snapshot is built once, and you hold the repository or you do not reach it.
 

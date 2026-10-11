@@ -1,6 +1,6 @@
 {
   "name": "@bunary/core",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-rc.2",
   "description": "Foundation module for Bunary - config, environment, and app helpers",
   "type": "module",
   "main": "./dist/index.js",

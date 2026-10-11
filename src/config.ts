@@ -213,9 +213,15 @@ class BunaryConfigRepository implements ConfigRepository {
   constructor(values: BunaryConfig) {
     // Shallow copy of the top level and of `app`, so the repository's own
     // snapshot cannot be renamed by a later mutation of the caller's object.
-    // Nested namespaces stay by reference: cloning them would break class
-    // instances and is not core's call to make.
-    this.#values = { ...values, app: { ...values.app } };
+    // Both copies are frozen so nothing can rewrite them through `get()`
+    // either: config is the source of truth, and runtime state belongs in
+    // token bindings. Nested namespaces stay by reference and unfrozen:
+    // cloning or freezing them would break class instances and is not
+    // core's call to make.
+    this.#values = Object.freeze({
+      ...values,
+      app: Object.freeze({ ...values.app }),
+    });
   }
 
   get(): BunaryConfig;

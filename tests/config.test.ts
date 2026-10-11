@@ -552,6 +552,20 @@ describe("createConfig()", () => {
     expect(repository.get()).toBe(repository.get());
   });
 
+  it("rejects writes through the snapshot returned by get()", () => {
+    const repository = createConfig({ app: { name: "Locked", env: "test" } });
+    const snapshot = repository.get();
+
+    expect(() => {
+      snapshot.app.env = "production";
+    }).toThrow(TypeError);
+    expect(() => {
+      snapshot.app = { name: "Replaced" };
+    }).toThrow(TypeError);
+    expect(repository.get("app.env")).toBe("test");
+    expect(repository.get("app.name")).toBe("Locked");
+  });
+
   it("keeps two repositories in one process independent", () => {
     const first = createConfig({ app: { name: "First", debug: true } });
     const second = createConfig({ app: { name: "Second", debug: false } });

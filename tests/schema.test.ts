@@ -249,6 +249,8 @@ describe("validateWith() with a callable Standard Schema (arktype-style)", () =>
 
   it("makes defineConfig throw ValidationError", async () => {
     const { defineConfig } = await import("../src/config");
-    expect(() => defineConfig(failing as never, {} as never)).toThrow(ValidationError);
+    expect(() => defineConfig(failing as never, {} as never)).toThrow(
+      ValidationError,
+    );
   });
 });

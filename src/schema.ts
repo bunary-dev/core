@@ -141,7 +141,12 @@ function formatPath(path: StandardSchemaV1.Issue["path"] | undefined): string {
 function isStandardSchema<Input, Output>(
   schema: SchemaLike<Input, Output>,
 ): schema is StandardSchemaV1<Input, Output> {
-  return typeof schema === "object" && schema !== null && "~standard" in schema;
+  // Callable validators (arktype) carry `~standard` on a function.
+  return (
+    (typeof schema === "object" || typeof schema === "function") &&
+    schema !== null &&
+    "~standard" in schema
+  );
 }
 
 /**

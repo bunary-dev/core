@@ -448,6 +448,33 @@ describe("Application provider failures", () => {
     expect(app.booted).toBe(false);
   });
 
+  it("does not leave an unhandled rejection when an async register later rejects", async () => {
+    const unhandled: unknown[] = [];
+    const onUnhandled = (reason: unknown) => unhandled.push(reason);
+    process.on("unhandledRejection", onUnhandled);
+
+    try {
+      const app = createApp({
+        config,
+        providers: [
+          defineProvider({
+            name: "async-register",
+            register: (async () => {
+              await tick(5);
+              throw new Error("late failure");
+            }) as unknown as () => void,
+          }),
+        ],
+      });
+
+      await expect(app.boot()).rejects.toThrow("must be synchronous");
+      await tick(30);
+      expect(unhandled).toEqual([]);
+    } finally {
+      process.off("unhandledRejection", onUnhandled);
+    }
+  });
+
   it("stops at the first failing register, leaving later ones unrun", async () => {
     let ran = false;
     const app = createApp({

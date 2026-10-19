@@ -160,6 +160,7 @@ describe("validateWith() with a Standard Schema", () => {
         version: 1,
         vendor: "test",
         validate: () =>
+          // biome-ignore lint/suspicious/noThenProperty: the thenable is the point of this test
           ({ then: () => {} }) as unknown as Promise<{ value: string }>,
       },
     };

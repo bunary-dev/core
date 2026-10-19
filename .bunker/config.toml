@@ -1,0 +1,5 @@
+# runs in each worktree before the agent
+setup = "bun install --frozen-lockfile"
+
+# must pass before anything is pushed: the same checks main requires (test, typecheck, lint)
+verify = "bun test && bun run typecheck && bun run lint"

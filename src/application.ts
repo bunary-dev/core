@@ -281,6 +281,9 @@ class BunaryApplication implements Application {
       }
 
       if (isThenable(result)) {
+        // Swallow a later rejection so it is not reported as unhandled on top
+        // of the boot rejection below.
+        Promise.resolve(result).catch(() => {});
         throw new BunaryError(
           `${describeProvider(provider, index)} returned a promise from register(); register must be synchronous - move async work into boot()`,
         );

@@ -215,3 +215,42 @@ describe("validateWith() with a plain function", () => {
     expect(() => validateWith(parse, {})).toThrow(inner);
   });
 });
+
+describe("validateWith() with a callable Standard Schema (arktype-style)", () => {
+  function callable(
+    validate: (input: unknown) => StandardSchemaV1.Result<unknown>,
+  ): SchemaLike<unknown, unknown> {
+    // Like arktype, calling it directly returns a value instead of throwing.
+    const fn = Object.assign((input: unknown) => ({ called: input }), {
+      "~standard": { version: 1, vendor: "fake", validate },
+    });
+    return fn as unknown as SchemaLike<unknown, unknown>;
+  }
+
+  const failing = callable(() => ({
+    issues: [{ message: "bad", path: ["PORT"] }],
+  }));
+  const passing = callable((input) => ({ value: { ok: input } }));
+
+  it("throws ValidationError when it reports issues", () => {
+    expect(() => validateWith(failing, {}, "Environment")).toThrow(
+      ValidationError,
+    );
+  });
+
+  it("returns the value when it succeeds", () => {
+    expect(validateWith(passing, 1)).toEqual({ ok: 1 });
+  });
+
+  it("makes defineEnv throw ValidationError", async () => {
+    const { defineEnv } = await import("../src/environment");
+    expect(() => defineEnv(failing as never, {})).toThrow(ValidationError);
+  });
+
+  it("makes defineConfig throw ValidationError", async () => {
+    const { defineConfig } = await import("../src/config");
+    expect(() => defineConfig(failing as never, {} as never)).toThrow(
+      ValidationError,
+    );
+  });
+});

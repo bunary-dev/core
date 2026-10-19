@@ -12,6 +12,7 @@ import { resolveEnvironment } from "./environment.js";
 import { BunaryError, MissingBindingError } from "./errors.js";
 import { describeProvider, type Provider } from "./provider.js";
 import type { Token } from "./token.js";
+import { isThenable } from "./thenable.js";
 import type { BunaryConfig } from "./types.js";
 
 /**
@@ -180,19 +181,6 @@ export interface Application {
    * ```
    */
   boot: () => Promise<this>;
-}
-
-/**
- * Whether a value returned by a hook is thenable.
- *
- * `register` is declared `: void`, and TypeScript lets an `async` function
- * satisfy a void-returning signature, so an accidental `async register` only
- * shows up at runtime.
- */
-function isThenable(value: unknown): value is PromiseLike<unknown> {
-  return (
-    typeof (value as PromiseLike<unknown> | undefined)?.then === "function"
-  );
 }
 
 /**

@@ -11,8 +11,8 @@ import type { EnvironmentType } from "./constants.js";
 import { resolveEnvironment } from "./environment.js";
 import { BunaryError, MissingBindingError } from "./errors.js";
 import { describeProvider, type Provider } from "./provider.js";
-import type { Token } from "./token.js";
 import { isThenable } from "./thenable.js";
+import type { Token } from "./token.js";
 import type { BunaryConfig } from "./types.js";
 
 /**

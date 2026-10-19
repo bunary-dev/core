@@ -9,6 +9,7 @@
 
 import type { StandardSchemaV1 } from "@standard-schema/spec";
 import { BunaryError } from "./errors.js";
+import { isThenable } from "./thenable.js";
 
 /**
  * Re-export of the [Standard Schema](https://standardschema.dev) spec type.
@@ -198,7 +199,7 @@ export function validateWith<Input, Output>(
 
   const result = schema["~standard"].validate(input);
 
-  if (result instanceof Promise) {
+  if (isThenable(result)) {
     throw new BunaryError(
       `Async schemas are not supported${
         context ? ` for ${context.toLowerCase()} validation` : ""

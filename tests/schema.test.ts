@@ -154,6 +154,23 @@ describe("validateWith() with a Standard Schema", () => {
     expect(() => validateWith(asyncSchema, "x")).toThrow(BunaryError);
   });
 
+  it("rejects a schema whose validate returns a non-Promise thenable", () => {
+    const thenableSchema: StandardSchemaV1<unknown, string> = {
+      "~standard": {
+        version: 1,
+        vendor: "test",
+        validate: () =>
+          // biome-ignore lint/suspicious/noThenProperty: the thenable is the point of this test
+          ({ then: () => {} }) as unknown as Promise<{ value: string }>,
+      },
+    };
+
+    expect(() => validateWith(thenableSchema, "x")).toThrow(
+      "Async schemas are not supported",
+    );
+    expect(() => validateWith(thenableSchema, "x")).toThrow(BunaryError);
+  });
+
   it("freezes the issues array", () => {
     try {
       validateWith(widen(z.object({ PORT: z.number() })), {});

@@ -32,17 +32,23 @@ jobs:
             echo "::error::Invalid semver format: $VERSION. Expected x.y.z or x.y.z-prerelease"
             exit 1
           fi
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
 
+      # Most merges don't bump the version: that is not a failure, there is just
+      # nothing to tag (#79). A new version in package.json is what makes a release.
       - name: Check if tag already exists
+        id: tag
         run: |
           TAG="v${{ steps.version.outputs.VERSION }}"
           if git rev-parse "$TAG" >/dev/null 2>&1; then
-            echo "::error::Tag $TAG already exists. Bump the version in package.json before merging."
-            exit 1
+            echo "::notice::Tag $TAG already exists; no version bump in this push, nothing to tag."
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Create and push tag
+        if: steps.tag.outputs.exists == 'false'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"

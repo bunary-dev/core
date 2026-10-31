@@ -1,7 +1,7 @@
 /**
  * @bunary/core - Example consumer test (#60)
  *
- * Runs `examples/basic-app` end to end, the way a real project would: a typed
+ * Runs `tests/fixtures/basic-app` end to end, the way a real project would: a typed
  * env, a `bunary.config.ts` with an augmented namespace, two providers with
  * tokens, `createApp`, `await app.boot()`, `app.get(token)` and
  * `app.config.get(path)`.
@@ -11,7 +11,7 @@
  *
  * | Symbol                  | Exercised in                                      |
  * |-------------------------|---------------------------------------------------|
- * | `createApp`             | examples/basic-app/main.ts                        |
+ * | `createApp`             | fixtures/basic-app/main.ts                        |
  * | `Application.config`    | main.ts, providers/http.ts, this file             |
  * | `Application.env`       | main.ts, this file ("resolved environment")       |
  * | `Application.boot()`    | main.ts                                           |
@@ -22,12 +22,12 @@
  * | `MissingBindingError`   | this file ("unknown token")                       |
  * | `Provider`              | providers/database.ts, providers/http.ts          |
  * | `defineProvider`        | providers/database.ts, providers/http.ts          |
- * | `defineConfig`          | examples/basic-app/bunary.config.ts (schema form) |
+ * | `defineConfig`          | fixtures/basic-app/bunary.config.ts (schema form) |
  * | `config.get`            | providers/database.ts, providers/http.ts, main.ts |
  * | `config.has`            | main.ts (report.hasDatabaseNamespace), this file  |
  * | `config.filled`         | main.ts (report.commandsFilled), this file        |
  * | `BunaryConfig` (augment)| bunary.config.ts (`declare module`)               |
- * | `defineEnv`             | examples/basic-app/env.ts                         |
+ * | `defineEnv`             | fixtures/basic-app/env.ts                         |
  * | `env()`                 | bunary.config.ts (APP_NAME)                       |
  * | `environment()`         | main.ts (report.environment)                      |
  * | `isDev()`               | main.ts (report.dev), this file                   |
@@ -40,12 +40,6 @@
  */
 
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
-import { loadEnv } from "../examples/basic-app/env.js";
-import {
-  createConnection,
-  DATABASE,
-} from "../examples/basic-app/providers/database.js";
-import { HTTP_SERVER } from "../examples/basic-app/providers/http.js";
 import type { Application } from "../src/application";
 import type { Command } from "../src/command";
 import { Environment } from "../src/constants";
@@ -53,8 +47,14 @@ import { environment, isDev, isProd, isTest } from "../src/environment";
 import { BunaryError, MissingBindingError } from "../src/errors";
 import { ValidationError } from "../src/schema";
 import { createToken } from "../src/token";
+import { loadEnv } from "./fixtures/basic-app/env.js";
+import {
+  createConnection,
+  DATABASE,
+} from "./fixtures/basic-app/providers/database.js";
+import { HTTP_SERVER } from "./fixtures/basic-app/providers/http.js";
 
-type MainModule = typeof import("../examples/basic-app/main.js");
+type MainModule = typeof import("./fixtures/basic-app/main.js");
 
 const ENV_VARS = {
   APP_ENV: "test",
@@ -78,7 +78,7 @@ beforeAll(async () => {
 
   // Imported after the env is in place: `bunary.config.ts` reads it at module
   // scope, exactly as a real project's config file does.
-  main = await import("../examples/basic-app/main.js");
+  main = await import("./fixtures/basic-app/main.js");
   const result = await main.runExample();
   app = result.app;
   report = result.report;
@@ -94,7 +94,7 @@ afterAll(() => {
   }
 });
 
-describe("example consumer: examples/basic-app", () => {
+describe("example consumer: tests/fixtures/basic-app", () => {
   it("boots the app and reports the resolved environment", () => {
     expect(report.appName).toBe("Basic App");
     expect(report.environment).toBe(Environment.TEST);

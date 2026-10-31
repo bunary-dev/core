@@ -3,7 +3,7 @@
  *
  * A real project writes `from "@bunary/core"`; this in-repo example imports
  * the package barrel by path so it runs against the working tree, and for the
- * same reason augments `"../../src/index.js"` where a consumer augments
+ * same reason augments `"../../../src/index.js"` where a consumer augments
  * `"@bunary/core"`.
  */
 
@@ -13,7 +13,7 @@ import {
   defineConfig,
   type EnvironmentType,
   env,
-} from "../../src/index.js";
+} from "../../../src/index.js";
 import { loadEnv } from "./env.js";
 
 const databaseSchema = z.object({
@@ -32,7 +32,7 @@ const httpSchema = z.object({
 export type DatabaseConfig = z.infer<typeof databaseSchema>;
 export type HttpConfig = z.infer<typeof httpSchema>;
 
-declare module "../../src/index.js" {
+declare module "../../../src/index.js" {
   interface BunaryConfig {
     database?: DatabaseConfig;
     http?: HttpConfig;

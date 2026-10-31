@@ -11,7 +11,7 @@ import {
   defineProvider,
   type Provider,
   type Token,
-} from "../../../src/index.js";
+} from "../../../../src/index.js";
 
 export interface DatabaseRow {
   readonly one: number;

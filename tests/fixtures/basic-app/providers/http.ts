@@ -12,7 +12,7 @@ import {
   defineProvider,
   type Provider,
   type Token,
-} from "../../../src/index.js";
+} from "../../../../src/index.js";
 import { DATABASE } from "./database.js";
 
 export interface HttpServer {

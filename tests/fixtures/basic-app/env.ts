@@ -6,7 +6,7 @@
  */
 
 import { z } from "zod";
-import { defineEnv, type EnvOf } from "../../src/index.js";
+import { defineEnv, type EnvOf } from "../../../src/index.js";
 
 export const envSchema = z.object({
   APP_ENV: z.enum(["development", "production", "test"]).default("development"),

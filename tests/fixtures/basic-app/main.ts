@@ -13,7 +13,7 @@ import {
   type EnvironmentType,
   environment,
   isDev,
-} from "../../src/index.js";
+} from "../../../src/index.js";
 import config from "./bunary.config.js";
 import { DATABASE, databaseProvider } from "./providers/database.js";
 import { HTTP_SERVER, httpProvider } from "./providers/http.js";

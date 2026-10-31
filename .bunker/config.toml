@@ -3,3 +3,7 @@ setup = "bun install --frozen-lockfile"
 
 # must pass before anything is pushed: the same checks main requires (test, typecheck, lint)
 verify = "bun test && bun run typecheck && bun run lint"
+
+[models]
+# Opus 5.5 for every bunker role in this repo (#87, matches cli#113 / http#122)
+default = "claude-opus-5-5"

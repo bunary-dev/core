@@ -7,7 +7,7 @@ Foundation for the Bunary framework: application (createApp, createToken), confi
 Requires Bun ≥ 1.4.0.
 
 ```bash
-bun add @bunary/core
+bun add @bunary/core@^0.4.0
 ```
 
 ## Quick start

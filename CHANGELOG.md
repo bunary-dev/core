@@ -5,7 +5,25 @@ All notable changes to `@bunary/core` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-11-01
+
+Release baseline: every `@bunary/*` package moves to 0.4.0 together. This is the first npm release since 0.2.0 and ships everything listed under the `1.0.0-rc.1` and `1.0.0-rc.2` entries below; those versions were never published and are superseded by 0.4.0. Coming from 0.2.0 or 0.3.0, read the Breaking items (#95).
+
+### Breaking
+
+- `getBunaryConfig()`, `clearBunaryConfig()`, the `BunaryConfigStore` interface and its `set()`/`get()`/`has()`/`clear()`, and deep-freezing of config objects are removed. Build an app with `createApp({ config })` and read `app.config` instead (#58, #95)
+- `createConfig(values)` now takes the values directly and returns a read-only `ConfigRepository` snapshot (dot-path `get()`/`has()`/`filled()`/`all()`) instead of a mutable store (#58, #95)
+- Unknown `app.env` / `APP_ENV` / `NODE_ENV` values throw at `createApp()` instead of falling back to `development` (#59, #95)
+- `env()` coercion: empty/whitespace values count as unset, so the default is returned (#48, #95)
+
+### Changed
+
+- Version aligned to 0.4.0 across all `@bunary/*` packages; install with `bun add @bunary/core@^0.4.0` (#95)
+- The npm tarball now includes `CHANGELOG.md` (#95)
+
 ## [1.0.0-rc.2] - 2026-10-12
+
+Never published; superseded by 0.4.0.
 
 ### Fixed
 
@@ -13,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0-rc.1] - 2026-09-22
 
-API freeze for the 1.0 line. Nothing is published to npm yet; the tag marks the contract. Epic: #61.
+Never published; superseded by 0.4.0. API freeze for what ships as 0.4.0; the tag marks the contract. Epic: #61.
 
 ### Added
 

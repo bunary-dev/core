@@ -5,7 +5,7 @@ Foundation module for the Bunary framework: configuration, environment helpers, 
 ## Installation
 
 ```bash
-bun add @bunary/core
+bun add @bunary/core@^0.4.0
 ```
 
 ## Usage
